@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConfiguraciÃ³n de Prompt - AutoMax Madrid</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#374ef6",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101222",
+                        "slate-custom": "#1e213a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .editor-container {
+            background: #0d0f1d;
+            border: 1px solid #2d3154;
+        }
+        .syntax-var { color: #374ef6; font-weight: 600; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2d3154; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-8 py-4 border-b border-slate-custom bg-background-dark/50 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<div class="p-2 bg-primary/20 rounded-lg">
+<span class="material-symbols-outlined text-primary">directions_car</span>
+</div>
+<div>
+<h2 class="text-lg font-bold leading-tight">AutoMax Madrid</h2>
+<p class="text-xs text-slate-400">ID del Tenant: AMX-MAD-2024</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium text-primary" href="#">ConfiguraciÃ³n</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Usuarios</a>
+</nav>
+<div class="flex items-center gap-3">
+<button class="p-2 hover:bg-slate-custom rounded-lg transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-gradient-to-tr from-primary to-blue-400" data-alt="Avatar de usuario con degradado azul"></div>
+</div>
+</div>
+</header>
+<!-- Navigation Tabs -->
+<div class="px-8 bg-background-dark/30 border-b border-slate-custom">
+<div class="flex gap-8 overflow-x-auto no-scrollbar">
+<a class="py-4 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-100" href="#">General</a>
+<a class="py-4 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-100" href="#">Widget</a>
+<a class="py-4 text-sm font-medium text-primary border-b-2 border-primary" href="#">Prompt</a>
+<a class="py-4 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-100" href="#">API/Integraciones</a>
+<a class="py-4 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-100" href="#">Leads</a>
+<a class="py-4 text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-slate-100" href="#">FacturaciÃ³n</a>
+</div>
+</div>
+<!-- Editor Main Layout -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Sidebar: Settings Sections -->
+<aside class="w-72 border-r border-slate-custom overflow-y-auto custom-scrollbar p-4 flex flex-col gap-2">
+<div class="flex items-center justify-between p-3 rounded-lg bg-slate-custom/50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">fingerprint</span>
+<span class="text-sm font-medium">Identidad</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-custom/30 cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">psychology</span>
+<span class="text-sm font-medium">Personalidad</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-custom/30 cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">gavel</span>
+<span class="text-sm font-medium">Reglas de negocio</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-custom/30 cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">quiz</span>
+<span class="text-sm font-medium">FAQ</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-custom/30 cursor-pointer border-l-2 border-primary bg-primary/5">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-sm">search_check</span>
+<span class="text-sm font-medium">ProspecciÃ³n</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_less</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-custom/30 cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">shield</span>
+<span class="text-sm font-medium">Seguridad</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+</aside>
+<!-- Center: Prompt Editor -->
+<div class="flex-1 flex flex-col p-6 overflow-hidden">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold">ConfiguraciÃ³n del Prompt de Sistema</h3>
+<div class="flex gap-3">
+<button class="px-4 py-2 rounded-lg bg-slate-custom hover:bg-slate-700 text-sm font-medium transition-colors">
+                                Restaurar borrador
+                            </button>
+<button class="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-sm font-bold flex items-center gap-2 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-sm">save</span>
+                                Guardar Cambios
+                            </button>
+</div>
+</div>
+<div class="editor-container flex-1 rounded-xl flex flex-col relative">
+<!-- Toolbar -->
+<div class="flex items-center gap-4 px-4 py-2 border-b border-slate-custom bg-slate-custom/20">
+<button class="p-1 hover:bg-slate-custom rounded"><span class="material-symbols-outlined text-sm">format_bold</span></button>
+<button class="p-1 hover:bg-slate-custom rounded"><span class="material-symbols-outlined text-sm">format_italic</span></button>
+<button class="p-1 hover:bg-slate-custom rounded"><span class="material-symbols-outlined text-sm">link</span></button>
+<div class="h-4 w-px bg-slate-custom mx-1"></div>
+<span class="text-xs text-slate-500 italic">Autoguardado hace 2 minutos</span>
+</div>
+<!-- IDE Content -->
+<div class="flex-1 p-6 font-mono text-sm leading-relaxed overflow-y-auto custom-scrollbar">
+<p class="mb-4 text-slate-500"># Instrucciones de comportamiento para el asistente</p>
+<p class="mb-2">Eres el asistente virtual experto de <span class="syntax-var">{{nombre_concesionario}}</span>. Tu objetivo es ayudar a los clientes a encontrar su coche ideal en nuestra sede de <span class="syntax-var">{{ubicacion_sede}}</span>.</p>
+<p class="mb-2">Debes mantener siempre un tono <span class="syntax-var">{{tono_voz}}</span> y profesional.</p>
+<p class="mb-2">Si el cliente pregunta por el inventario, utiliza los datos dinÃ¡micos de <span class="syntax-var">{{catalogo_actual}}</span> para dar informaciÃ³n precisa sobre precios y disponibilidad.</p>
+<p class="mb-2">Cuando detectes una intenciÃ³n de compra clara, solicita el <span class="syntax-var">{{campo_contacto_preferido}}</span> para que un asesor comercial humano pueda contactarles en menos de 24 horas.</p>
+<p class="mb-2">Recuerda mencionar que estamos abiertos en horario de <span class="syntax-var">{{horario_comercial}}</span>.</p>
+<div class="animate-pulse h-4 w-1 bg-primary inline-block align-middle ml-1"></div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar: Variables & Tools -->
+<aside class="w-80 border-l border-slate-custom bg-background-dark/20 p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
+<div>
+<h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Variables disponibles</h4>
+<div class="flex flex-wrap gap-2">
+<button class="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-xs text-primary font-mono hover:bg-primary/20 transition-colors">
+                                {{nombre_concesionario}}
+                            </button>
+<button class="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-xs text-primary font-mono hover:bg-primary/20 transition-colors">
+                                {{ubicacion_sede}}
+                            </button>
+<button class="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-xs text-primary font-mono hover:bg-primary/20 transition-colors">
+                                {{tono_voz}}
+                            </button>
+<button class="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-xs text-primary font-mono hover:bg-primary/20 transition-colors">
+                                {{catalogo_actual}}
+                            </button>
+<button class="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-xs text-primary font-mono hover:bg-primary/20 transition-colors">
+                                {{horario_comercial}}
+                            </button>
+<button class="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-xs text-primary font-mono hover:bg-primary/20 transition-colors">
+                                {{nombre_agente}}
+                            </button>
+<button class="px-2 py-1 rounded bg-primary/10 border border-primary/30 text-xs text-primary font-mono hover:bg-primary/20 transition-colors">
+                                {{enlace_cita}}
+                            </button>
+</div>
+<p class="text-[10px] text-slate-500 mt-3">Haz clic en una variable para insertarla en el editor en la posiciÃ³n del cursor.</p>
+</div>
+<div class="h-px bg-slate-custom"></div>
+<div class="flex-1 flex flex-col">
+<h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Prueba de Prompt</h4>
+<div class="flex-1 bg-slate-custom/30 rounded-xl p-4 flex flex-col gap-4 mb-4 overflow-hidden border border-slate-custom">
+<div class="flex gap-2 items-start">
+<div class="size-6 rounded-full bg-slate-600 shrink-0" data-alt="Icono de usuario genÃ©rico"></div>
+<div class="bg-slate-700/50 p-2 rounded-lg text-xs leading-normal">
+                                    Hola, Â¿tienen el nuevo Audi A3 en stock?
+                                </div>
+</div>
+<div class="flex gap-2 items-start flex-row-reverse">
+<div class="size-6 rounded-full bg-primary shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">smart_toy</span>
+</div>
+<div class="bg-primary/20 p-2 rounded-lg text-xs leading-normal border border-primary/30">
+                                    Â¡Hola! SÃ­, en AutoMax Madrid disponemos actualmente de 3 unidades del Audi A3. Â¿Te gustarÃ­a agendar una prueba de conducciÃ³n?
+                                </div>
+</div>
+</div>
+<div class="relative">
+<input class="w-full bg-slate-custom/50 border-slate-custom rounded-lg px-4 py-2 pr-10 text-xs focus:ring-primary focus:border-primary" placeholder="Escribe un mensaje de prueba..." type="text"/>
+<button class="absolute right-2 top-1.5 text-primary">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<button class="w-full py-3 bg-primary/10 border border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">chat_bubble</span>
+                        Probar prompt en vivo
+                    </button>
+</aside>
+</main>
+</div>
+</div>
+</body></html>

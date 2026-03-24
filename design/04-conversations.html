@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#374ef6",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101222",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #374ef640; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen flex-col overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-6 py-3 shrink-0">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-white">smart_toy</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold tracking-tight">Carchat AI</h2>
+</div>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
+<span class="material-symbols-outlined text-sm">store</span>
+<span>Concesionario Madrid Central</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
+<span class="material-symbols-outlined text-sm">link</span>
+<span>/stock/audi-q5</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full border border-primary/20">
+<span class="material-symbols-outlined text-sm text-primary">token</span>
+<span>1.240 tokens</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex gap-2">
+<button class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">search</span>
+</button>
+<button class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">notifications</span>
+</button>
+<button class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">settings</span>
+</button>
+</div>
+<div class="h-8 w-px bg-slate-200 dark:border-slate-800"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold">Admin Panel</p>
+<p class="text-xs text-slate-500">Gestor de Ventas</p>
+</div>
+<div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary" data-alt="User profile avatar circle">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex flex-1 overflow-hidden">
+<!-- Left Panel: Chat List (30%) -->
+<aside class="w-[30%] min-w-[320px] border-r border-slate-200 dark:border-slate-800 flex flex-col bg-white dark:bg-background-dark/50">
+<div class="p-4 border-b border-slate-200 dark:border-slate-800">
+<h3 class="font-bold text-lg px-2">Conversaciones</h3>
+<div class="mt-4 flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-primary text-white text-xs font-semibold">Todos</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold">Leads</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold">Activos</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- Chat Item: Lead -->
+<div class="p-4 flex gap-4 cursor-pointer hover:bg-primary/5 border-l-4 border-amber-400 bg-amber-400/5 transition-colors">
+<div class="relative shrink-0">
+<div class="h-12 w-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden border-2 border-amber-400">
+<img class="w-full h-full object-cover" data-alt="Portrait of Juan Garcia customer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMfQS1jzqQt7-5YYj0YPFbLrjeiF8qzqIbhNOKsobS8QRumTph0HcEZRYl-WtN8AiuLSqrbPx3vWxVKCVIP63AYySFdE0BLFEUgz9fEEVPNf7J2ETe7fsBSFeGxSE4BsQ0EHUlUl9pBugzwW2jIoRrLRa_WzUTtPc-43D5S0tfCrU5JBGNUKumnNFPrsMxXTOQU3DY2UgGq9YChGDtCeTFMGigElZcHbNvQEhFxwZSc6f74gcUaxjm-AG6vgx5OBSI5PeazcnBFamJ"/>
+</div>
+<div class="absolute -bottom-1 -right-1 h-4 w-4 bg-amber-400 rounded-full border-2 border-white dark:border-background-dark"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-bold text-sm truncate">Juan GarcÃ­a</h4>
+<span class="text-[10px] text-slate-500 font-medium">Hace 2 min</span>
+</div>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] uppercase tracking-wider font-bold text-amber-600 dark:text-amber-400">Lead Capturado</span>
+<span class="h-1 w-1 rounded-full bg-slate-300"></span>
+<span class="text-[10px] text-slate-500">Madrid-Central</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate italic">"Me interesa el Audi Q5 que habÃ©is publicado..."</p>
+</div>
+</div>
+<!-- Chat Item: Active -->
+<div class="p-4 flex gap-4 cursor-pointer hover:bg-primary/5 transition-colors bg-primary/10 border-l-4 border-primary">
+<div class="relative shrink-0">
+<div class="h-12 w-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden border-2 border-primary">
+<img class="w-full h-full object-cover" data-alt="User avatar placeholder female" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBldivkBBURFlCMx650qcBpv-GHej0SXV0iDKyKnqjFHhQQ6e0WkObYkrvyR4E2C7s3KY7meJHOEPP1IoZ6jV96OzTMmIhscRNmVpypE-sGUudkd-qA6u3FZBn3ZJyEVPoYgHicTxPN0RFH3ufxUS8kQncvYHmZMosidbVytkomFFtOKlbE7hbnwkSQwaG3XpVMWc363qOZK22I5qENR-Ln1WObRp9HivmecTczMIBxcAZNsMAd3lN_MsLrWMEzIqs740Pmn_rEDkR5"/>
+</div>
+<div class="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white dark:border-background-dark"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-bold text-sm truncate">AnÃ³nimo #4281</h4>
+<span class="text-[10px] text-primary font-bold">En lÃ­nea</span>
+</div>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] uppercase tracking-wider font-bold text-primary">Chat Activo</span>
+<span class="h-1 w-1 rounded-full bg-slate-300"></span>
+<span class="text-[10px] text-slate-500">Landing Page</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">Â¿TenÃ©is stock del BMW Serie 3 en azul?</p>
+</div>
+</div>
+<!-- Chat Item: Finished -->
+<div class="p-4 flex gap-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors opacity-80 border-l-4 border-transparent">
+<div class="relative shrink-0">
+<div class="h-12 w-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-slate-400">person</span>
+</div>
+<div class="absolute -bottom-1 -right-1 h-4 w-4 bg-slate-400 rounded-full border-2 border-white dark:border-background-dark"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h4 class="font-bold text-sm truncate">AnÃ³nimo #4275</h4>
+<span class="text-[10px] text-slate-500 font-medium">Hace 1h</span>
+</div>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] uppercase tracking-wider font-bold text-slate-500">Finalizado</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">Gracias por la informaciÃ³n, lo pensarÃ©.</p>
+</div>
+</div>
+<!-- Additional items for scrolling -->
+<div class="p-4 flex gap-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors opacity-80 border-l-4 border-transparent">
+<div class="h-12 w-12 shrink-0 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center"><span class="material-symbols-outlined text-slate-400">person</span></div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-1"><h4 class="font-bold text-sm truncate">AnÃ³nimo #4270</h4><span class="text-[10px] text-slate-500 font-medium">Ayer</span></div>
+<p class="text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-1">Finalizado</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">UbicaciÃ³n del concesionario por favor.</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Right Panel: Chat Flow (70%) -->
+<section class="flex-1 flex flex-col bg-slate-50 dark:bg-background-dark/30">
+<!-- Chat Messages Scroll Area -->
+<div class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
+<!-- Bot Message -->
+<div class="flex gap-3 max-w-[80%]">
+<div class="h-8 w-8 rounded-lg bg-primary shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">smart_toy</span>
+</div>
+<div class="bg-slate-200 dark:bg-slate-800 p-4 rounded-xl rounded-tl-none shadow-sm">
+<p class="text-sm leading-relaxed">Â¡Hola! Soy Carchat AI, tu asistente personal de AutomÃ³viles Madrid. Â¿En quÃ© vehÃ­culo estÃ¡s interesado hoy?</p>
+<span class="text-[10px] text-slate-500 mt-2 block">10:42 AM</span>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-3 max-w-[80%] ml-auto flex-row-reverse">
+<div class="h-8 w-8 rounded-lg bg-slate-400 shrink-0 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Customer user avatar thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxyrHopJ1hhc4ZXgcntdRnQ8YwFMzIBUcpZTVwboJV1B9osD6V_D06fHoObou5A0bZblswel0dtHw4FPypnwipJZEmCbYl2WVPwsiTqSETUbv_-qD3Du0xOIYWNv2PA6P9dVS4BHbRWL1ANzrxZpjq_ZtwXjwCCVFBjka5PeCNk7pQ_B6qFWmkTNs2G7WlauB7YoKEtRMeFT_lP7ewXsFAX_OBYy6x4d2td7TuQ_pCkEClKnM6JIQr8GDADNOdmRCnaM8C5a__kss2"/>
+</div>
+<div class="bg-primary p-4 rounded-xl rounded-tr-none shadow-md shadow-primary/10">
+<p class="text-sm text-white leading-relaxed">Estoy buscando un SUV con poco kilometraje. Â¿TenÃ©is algo tipo Audi Q5 o BMW?</p>
+<span class="text-[10px] text-white/70 mt-2 block text-right">10:43 AM</span>
+</div>
+</div>
+<!-- Bot Message with Vehicle Carousel -->
+<div class="flex gap-3 max-w-[90%]">
+<div class="h-8 w-8 rounded-lg bg-primary shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">smart_toy</span>
+</div>
+<div class="space-y-4 w-full">
+<div class="bg-slate-200 dark:bg-slate-800 p-4 rounded-xl rounded-tl-none shadow-sm inline-block max-w-fit">
+<p class="text-sm leading-relaxed">Excelente elecciÃ³n. Tengo estas dos opciones premium disponibles ahora mismo en nuestro stock:</p>
+<span class="text-[10px] text-slate-500 mt-2 block">10:44 AM</span>
+</div>
+<!-- Vehicle Carousel -->
+<div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
+<!-- Card 1 -->
+<div class="min-w-[280px] bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-700">
+<div class="h-40 bg-slate-300 relative">
+<img class="w-full h-full object-cover" data-alt="White Audi Q5 SUV exterior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBokL2ajbglsPc8S0Jako-yiwxbbWgEzY0SLSWrylibZVeFv2lYNhtU3FPcB5wk-Ho9rcGutcl74d46BbEKbmKphWLB7f9jTCGYZv-Mts7_w8oOg_8_HeSejmSOrK4voK40MQ-S3JHOLdSk4g1to5FdlHW115lUqLcaG_O6vLhr_y5qVclssymDLM25oyszKJRIZnPqm9bVnctAUIk0sXpBVuYxUJJC-9DEjKJGA0vFbRHwEdvb9G1pQMgoZwj2DKA3wefQ7QcME6H4"/>
+<div class="absolute top-2 right-2 bg-primary px-2 py-1 rounded-lg text-white font-bold text-xs">RECOMENDADO</div>
+</div>
+<div class="p-4">
+<h5 class="font-bold text-lg">Audi Q5 Sportback</h5>
+<p class="text-primary font-bold text-xl mb-3">32.900â‚¬</p>
+<div class="grid grid-cols-2 gap-2 mb-4">
+<div class="flex items-center gap-1.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-sm">speed</span>
+<span>45.000 km</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span>AutomÃ¡tico</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+<span>2021</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-sm">local_gas_station</span>
+<span>HÃ­brido</span>
+</div>
+</div>
+<button class="w-full py-2 bg-primary/10 text-primary font-bold text-sm rounded-lg border border-primary/20 hover:bg-primary hover:text-white transition-all">Ver detalles</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="min-w-[280px] bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-700">
+<div class="h-40 bg-slate-300 relative">
+<img class="w-full h-full object-cover" data-alt="Grey BMW 3 Series sedan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW5XFB8YrxXILprVZrYhMMYsv3r4LQO4LLbzTXqNQCyRJ68WnwmDoKeKNAxuY-DDzWytPdq2k5o00Dk0OPOGv4Rbgv8ggFLkgdzN9RlFtSsxTsN5DUAscW2Z2zN11kR90wkORhqnrSb07bixcithpLJt3QagoSDpEF4NpJWbxFUKePpeN2UOf5vDmD5H-aFQM8h49OkoF5CcWQ-VliKXlB9yjaedAzKsixMBajmLHvsiK1XrwX2uiSW-JDcfLhlnUC38sOFHA-CDYx"/>
+</div>
+<div class="p-4">
+<h5 class="font-bold text-lg">BMW Serie 3 320d</h5>
+<p class="text-primary font-bold text-xl mb-3">35.500â‚¬</p>
+<div class="grid grid-cols-2 gap-2 mb-4">
+<div class="flex items-center gap-1.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-sm">speed</span>
+<span>12.500 km</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span>AutomÃ¡tico</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+<span>2022</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500">
+<span class="material-symbols-outlined text-sm">local_gas_station</span>
+<span>DiÃ©sel</span>
+</div>
+</div>
+<button class="w-full py-2 bg-primary/10 text-primary font-bold text-sm rounded-lg border border-primary/20 hover:bg-primary hover:text-white transition-all">Ver detalles</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Green Banner: Lead Captured -->
+<div class="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 bg-green-500 rounded-full flex items-center justify-center text-white">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+</div>
+<div>
+<h6 class="text-green-600 dark:text-green-400 font-bold text-sm">Lead capturado con Ã©xito</h6>
+<p class="text-xs text-green-700 dark:text-green-500/80">Juan GarcÃ­a â€¢ 612 345 678 â€¢ juan.garcia@email.com</p>
+</div>
+</div>
+<button class="text-xs bg-green-500 text-white font-bold py-1.5 px-4 rounded-lg">CREAR CITA</button>
+</div>
+<!-- User Message -->
+<div class="flex gap-3 max-w-[80%] ml-auto flex-row-reverse">
+<div class="h-8 w-8 rounded-lg bg-slate-400 shrink-0 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Customer user avatar thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFCpv44VlevQh0nENeVFNvbigkNMtPTLtIUtsvybxMxCA05_1s1o2L8BcBylzHrWdSpejMyv5bZm-k7oNiC9nuOp_faH-DNx5Tw9MJ4ITCUqKTzH_GSEHeOYXCLtDFdcr-U-556s_YQ4MWMat8N2svYJUh3xgLP75FrUli0YhrH0NVTHfRuekM3TdaODYoN5S4qA1Qs3XfHRcLqPXF2t75TRqTsWtyHCB0B4BKseWdTnkQVSK0o77wDjCt7b7YsubDKbg27mvhWD-Y"/>
+</div>
+<div class="bg-primary p-4 rounded-xl rounded-tr-none shadow-md shadow-primary/10">
+<p class="text-sm text-white leading-relaxed">Me gusta el Audi. Â¿Se puede financiar?</p>
+<span class="text-[10px] text-white/70 mt-2 block text-right">10:46 AM</span>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-6 bg-white dark:bg-background-dark/50 border-t border-slate-200 dark:border-slate-800">
+<div class="relative flex items-center">
+<button class="absolute left-3 p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<input class="w-full pl-14 pr-32 py-4 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white placeholder:text-slate-500" placeholder="Escribe un mensaje en nombre de la IA o usa '/' para comandos..." type="text"/>
+<div class="absolute right-3 flex gap-2">
+<button class="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600">IA OFF</button>
+<button class="p-2 bg-primary text-white rounded-lg shadow-md shadow-primary/20 hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<div class="mt-3 flex justify-center gap-6">
+<span class="text-[11px] text-slate-500 flex items-center gap-1.5"><span class="h-1.5 w-1.5 bg-primary rounded-full"></span> IA estÃ¡ redactando respuestas automÃ¡ticamente</span>
+<span class="text-[11px] text-slate-500 flex items-center gap-1.5"><span class="h-1.5 w-1.5 bg-green-500 rounded-full"></span> ConexiÃ³n estable</span>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

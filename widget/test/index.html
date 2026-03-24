@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worldcars — Coches de Ocasión en Madrid</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: #3b82f6; }
+    nav a {
+      color: #94a3b8;
+      text-decoration: none;
+      margin-left: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: white; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      color: white;
+      text-align: center;
+      padding: 60px 24px;
+    }
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      font-size: 18px;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Grid de coches */
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      margin: 40px 0 24px;
+      color: #0f172a;
+    }
+    .cars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+    .car-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .car-card:hover {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
+    }
+    .car-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #e2e8f0;
+    }
+    .car-card-body { padding: 16px; }
+    .car-card-body h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .car-specs {
+      color: #64748b;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .car-price {
+      font-size: 22px;
+      font-weight: 800;
+      color: #dc2626;
+      margin-bottom: 12px;
+    }
+    .car-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      text-align: center;
+      flex: 1;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-primary { background: #1e40af; color: white; }
+    .btn-outline { background: white; color: #1e40af; border: 2px solid #1e40af; }
+
+    /* Footer */
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">World<span>cars</span></div>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Coches</a>
+      <a href="#">Financiación</a>
+      <a href="#">Contacto</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Tu coche de ocasión te espera</h1>
+    <p>Los mejores vehículos seminuevos con garantía, financiación a medida y entrega a domicilio en Madrid</p>
+  </section>
+
+  <h2 class="section-title">Vehículos Destacados</h2>
+
+  <div class="cars-grid">
+    <div class="car-card" data-vehicle-id="3361877" data-vehicle-brand="audi" data-vehicle-model="q5">
+      <img src="https://placehold.co/400x250/1a1a2e/ffffff?text=Audi+Q5" alt="Audi Q5">
+      <div class="car-card-body">
+        <h3>Audi Q5 2.0 TDI Quattro</h3>
+        <p class="car-specs">2021 · 45.000 km · Diésel · Automático · Blanco</p>
+        <p class="car-price">32.900 €</p>
+        <div class="car-actions">
+          <a href="/comprar-coches-ocasion/audi/q5/3361877" class="btn btn-primary">Ver ficha</a>
+          <button class="btn btn-outline">Contactar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="car-card" data-vehicle-id="3361878" data-vehicle-brand="bmw" data-vehicle-model="serie-3">
+      <img src="https://placehold.co/400x250/1a1a2e/ffffff?text=BMW+Serie+3" alt="BMW Serie 3">
+      <div class="car-card-body">
+        <h3>BMW Serie 3 320d xDrive</h3>
+        <p class="car-specs">2022 · 28.000 km · Diésel · Automático · Negro</p>
+        <p class="car-price">35.500 €</p>
+        <div class="car-actions">
+          <a href="/comprar-coches-ocasion/bmw/serie-3/3361878" class="btn btn-primary">Ver ficha</a>
+          <button class="btn btn-outline">Contactar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="car-card" data-vehicle-id="3361883" data-vehicle-brand="toyota" data-vehicle-model="rav4">
+      <img src="https://placehold.co/400x250/1a1a2e/ffffff?text=Toyota+RAV4" alt="Toyota RAV4">
+      <div class="car-card-body">
+        <h3>Toyota RAV4 2.5 Hybrid AWD</h3>
+        <p class="car-specs">2022 · 25.000 km · Híbrido · Automático · Gris</p>
+        <p class="car-price">34.900 €</p>
+        <div class="car-actions">
+          <a href="/comprar-coches-ocasion/toyota/rav4/3361883" class="btn btn-primary">Ver ficha</a>
+          <button class="btn btn-outline">Contactar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="car-card" data-vehicle-id="3361885" data-vehicle-brand="tesla" data-vehicle-model="model-3">
+      <img src="https://placehold.co/400x250/1a1a2e/ffffff?text=Tesla+Model+3" alt="Tesla Model 3">
+      <div class="car-card-body">
+        <h3>Tesla Model 3 Long Range</h3>
+        <p class="car-specs">2022 · 30.000 km · Eléctrico · Automático · Blanco</p>
+        <p class="car-price">36.900 €</p>
+        <div class="car-actions">
+          <a href="/comprar-coches-ocasion/tesla/model-3/3361885" class="btn btn-primary">Ver ficha</a>
+          <button class="btn btn-outline">Contactar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2024 Worldcars — Coches de Ocasión en Madrid. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- AutoChat AI Widget -->
+  <script src="/dist/widget.min.js" data-tenant="a1b2c3d4-e5f6-7890-abcd-ef1234567890" data-api="http://localhost:8001/v1"></script>
+
+</body>
+</html>

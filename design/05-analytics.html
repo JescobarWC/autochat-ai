@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Carchat AI - Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#374ef6",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101222",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chart-bar { transition: height 0.3s ease; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-full min-h-screen w-full flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-6 py-4 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Carchat <span class="text-primary">AI</span></h2>
+</div>
+<div class="flex flex-1 justify-center max-w-2xl px-8">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="Buscar mÃ©tricas o vehÃ­culos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full"></span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 dark:border-slate-800 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-semibold">Admin Concesionario</p>
+<p class="text-[10px] text-slate-500">Premium Plan</p>
+</div>
+<div class="size-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Avatar of a professional car dealer administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgmSqale-BCzG_sY9E5o3RUgSLn1IPi306RbB5UM9h0wN3kz2rxfNyEJRJ4zo8rJFVdgVGp44boRIAbEoZti87gk7P4bxHlRutUUiKB8QJddnHJaNmM87H5pckTAc0xEGxFmzNxNpDE1aA1CpXyTQWFQuhHpMbij6UX_zTZysgBJksvwMfqaUG9FYSTkbP_VsHNIVPCk4HG47DY-j4BEISaylHgxdUWlRgFLqKJ-dtxE_FzgnCEftkTaqX8-y5hvrqG2h5_bAsnUoZ"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 p-6 lg:px-12 max-w-[1600px] mx-auto w-full">
+<!-- Filter Bar -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div>
+<h1 class="text-2xl font-bold">Panel de AnalÃ­tica</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm">MonitorizaciÃ³n de rendimiento en tiempo real</p>
+</div>
+<div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+<!-- Tenant Selector -->
+<div class="relative min-w-[200px] flex-1 md:flex-none">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">store</span>
+<select class="w-full appearance-none bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-9 pr-8 py-2 text-sm focus:ring-primary">
+<option>Todos los Concesionarios</option>
+<option>Madrid Norte - Central</option>
+<option>Barcelona Diagonal</option>
+<option>Valencia Puerto</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+</div>
+<!-- Date Picker -->
+<div class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 gap-2 text-sm cursor-pointer hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-slate-400 text-sm">calendar_month</span>
+<span>01 Oct 2023 - 31 Oct 2023</span>
+<span class="material-symbols-outlined text-slate-400 text-sm ml-2">tune</span>
+</div>
+<button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow-lg shadow-primary/20 hover:bg-primary/90">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Exportar
+                    </button>
+</div>
+</div>
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+<div class="flex justify-between items-start mb-2">
+<span class="text-slate-500 text-xs font-medium uppercase tracking-wider">Conversaciones</span>
+<span class="p-1.5 bg-primary/10 rounded-lg text-primary"><span class="material-symbols-outlined text-sm">chat</span></span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold">1,284</h3>
+<span class="text-emerald-500 text-xs font-bold flex items-center"><span class="material-symbols-outlined text-xs">trending_up</span> 8.2%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+<div class="flex justify-between items-start mb-2">
+<span class="text-slate-500 text-xs font-medium uppercase tracking-wider">Leads Generados</span>
+<span class="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-500"><span class="material-symbols-outlined text-sm">person_add</span></span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold">156</h3>
+<span class="text-rose-500 text-xs font-bold flex items-center"><span class="material-symbols-outlined text-xs">trending_down</span> 2.1%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+<div class="flex justify-between items-start mb-2">
+<span class="text-slate-500 text-xs font-medium uppercase tracking-wider">% ConversiÃ³n</span>
+<span class="p-1.5 bg-amber-500/10 rounded-lg text-amber-500"><span class="material-symbols-outlined text-sm">query_stats</span></span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold">12.1%</h3>
+<span class="text-emerald-500 text-xs font-bold flex items-center"><span class="material-symbols-outlined text-xs">trending_up</span> 0.5%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+<div class="flex justify-between items-start mb-2">
+<span class="text-slate-500 text-xs font-medium uppercase tracking-wider">Coste Estimado</span>
+<span class="p-1.5 bg-blue-500/10 rounded-lg text-blue-500"><span class="material-symbols-outlined text-sm">payments</span></span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold">450â‚¬</h3>
+<span class="text-rose-500 text-xs font-bold flex items-center"><span class="material-symbols-outlined text-xs">trending_down</span> 10%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+<div class="flex justify-between items-start mb-2">
+<span class="text-slate-500 text-xs font-medium uppercase tracking-wider">Tiempo Promedio</span>
+<span class="p-1.5 bg-purple-500/10 rounded-lg text-purple-500"><span class="material-symbols-outlined text-sm">timer</span></span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-2xl font-bold">4m 12s</h3>
+<span class="text-rose-500 text-xs font-bold flex items-center"><span class="material-symbols-outlined text-xs">trending_down</span> 15s</span>
+</div>
+</div>
+</div>
+<!-- Charts Row 1 -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+<!-- Bar Chart: Leads by Day -->
+<div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-bold">Leads por dÃ­a de la semana</h4>
+<span class="material-symbols-outlined text-slate-400">more_horiz</span>
+</div>
+<div class="flex items-end justify-between h-48 gap-2">
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative group">
+<div class="bg-primary w-full rounded-t-lg h-[40%]" title="12 leads"></div>
+</div>
+<span class="text-xs text-slate-500">Lun</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative group">
+<div class="bg-primary w-full rounded-t-lg h-[65%]" title="18 leads"></div>
+</div>
+<span class="text-xs text-slate-500">Mar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative group">
+<div class="bg-primary w-full rounded-t-lg h-[85%]" title="24 leads"></div>
+</div>
+<span class="text-xs text-slate-500">MiÃ©</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative group">
+<div class="bg-primary w-full rounded-t-lg h-[55%]" title="16 leads"></div>
+</div>
+<span class="text-xs text-slate-500">Jue</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative group">
+<div class="bg-primary w-full rounded-t-lg h-[95%]" title="28 leads"></div>
+</div>
+<span class="text-xs text-slate-500">Vie</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative group">
+<div class="bg-primary w-full rounded-t-lg h-[30%]" title="9 leads"></div>
+</div>
+<span class="text-xs text-slate-500">SÃ¡b</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 rounded-t-lg relative group">
+<div class="bg-primary w-full rounded-t-lg h-[20%]" title="6 leads"></div>
+</div>
+<span class="text-xs text-slate-500">Dom</span>
+</div>
+</div>
+</div>
+<!-- Donut Chart: Interest -->
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
+<h4 class="font-bold mb-6">DistribuciÃ³n por InterÃ©s</h4>
+<div class="flex flex-col items-center">
+<div class="relative size-40 mb-6">
+<svg class="size-full" viewbox="0 0 36 36">
+<circle class="stroke-slate-100 dark:stroke-slate-700" cx="18" cy="18" fill="none" r="16" stroke-width="4"></circle>
+<circle class="stroke-primary" cx="18" cy="18" fill="none" r="16" stroke-dasharray="45, 100" stroke-dashoffset="0" stroke-width="4"></circle>
+<circle class="stroke-emerald-500" cx="18" cy="18" fill="none" r="16" stroke-dasharray="20, 100" stroke-dashoffset="-45" stroke-width="4"></circle>
+<circle class="stroke-amber-500" cx="18" cy="18" fill="none" r="16" stroke-dasharray="15, 100" stroke-dashoffset="-65" stroke-width="4"></circle>
+<circle class="stroke-rose-500" cx="18" cy="18" fill="none" r="16" stroke-dasharray="20, 100" stroke-dashoffset="-80" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-bold">SUV</span>
+<span class="text-xs text-slate-500">45%</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-x-6 gap-y-2 w-full text-xs">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-primary"></span>
+<span class="text-slate-500">SUV (45%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-emerald-500"></span>
+<span class="text-slate-500">Berlina (20%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-amber-500"></span>
+<span class="text-slate-500">Compacto (15%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-rose-500"></span>
+<span class="text-slate-500">Otros (20%)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Vehicles Table & Heatmap Row -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+<!-- Most Consulted Vehicles Table -->
+<div class="xl:col-span-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+<h4 class="font-bold text-lg">VehÃ­culos mÃ¡s consultados</h4>
+<button class="text-primary text-sm font-semibold hover:underline">Ver todos</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100 dark:border-slate-700">
+<th class="px-6 py-4 font-semibold">Modelo</th>
+<th class="px-6 py-4 font-semibold text-center">Consultas</th>
+<th class="px-6 py-4 font-semibold text-center">Leads</th>
+<th class="px-6 py-4 font-semibold text-right">Rendimiento</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden">
+<img alt="Mercedes GLC" class="w-full h-full object-cover" data-alt="Silver Mercedes-Benz GLC SUV front view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEWw9n1ROpQLlFjg2WxdlJfbif76G1RhBpgjW4l7pvX49_o49_b2LgR1pZz_AUZ6dXZjfIyvy6NJYbYlx1MUdvqKBTcIqJ6sEO4a4ELN14rHrGdZWV7yjn338SPIcmg6C3ZrrKlg38oZHLwoaUaltqVskQ5I5ZQ9Gu2Z__13GJGNgFCF-M3I60yBlBFl76eFGHmZbcJ2Z-_AD12FGi5HcrytZ9nO1eskP8jhTBXZef3k0Psq0Hh-fEdcJCmc5HtnSVoKJlrIx4A2VH"/>
+</div>
+<div>
+<p class="font-bold text-sm">Mercedes GLC</p>
+<p class="text-xs text-slate-500">SUV Premium</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-center text-sm font-medium">452</td>
+<td class="px-6 py-4 text-center text-sm font-medium">38</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<div class="w-24 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[84%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">8.4%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden">
+<img alt="VW Golf" class="w-full h-full object-cover" data-alt="Blue Volkswagen Golf hatchback profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe7MrswA61xEKe3Nj48Qfequ9e0n0qWE0UXkTj__s2TRnrPhd3AWRucDJtFeCQPf9VHIl_H77HSWNzz7qDSwjtF94eEwbIVk9CvEQhjI_KLMJ2lViPTIh1WEO_n27BDSOl1ztbSHvHr-ReQRqtP3d8Yqwt5cqEEqfDBFRnnpFIkeF6EPY7nMi8R30KWBgECBiZf-nmxhG_4sAgRWn8aD_G7dxmubbkJqluzcaI-_SYkSZ3AMIeezLKqxK9uyLZ48gbKyvTxvdmxRJT"/>
+</div>
+<div>
+<p class="font-bold text-sm">VW Golf GTI</p>
+<p class="text-xs text-slate-500">Compacto</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-center text-sm font-medium">312</td>
+<td class="px-6 py-4 text-center text-sm font-medium">21</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<div class="w-24 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[67%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">6.7%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden">
+<img alt="BMW 3 Series" class="w-full h-full object-cover" data-alt="Dark grey BMW 3 Series sedan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8imC9Vs_0SFB_sH1vTYsX9lx4dl7Tuyt2vq9QV0rSTpD-VVB8SDDZL9vpEY5vhz5sxf-xJKgIL4XEPKH7FnXfC0Rm4ELwC1NAxwNVJJWvvXRjnvucdu_Gn646WJKQfn2lhvzChMFopLYTZhaeLZtx56XcM_m3I5b_aXfasJ7VE2mwq0ivGN3WRkll5d47UQtNFtozLc765H5LUP0RPH1aO1nJ3HZ4fH0UVp0awhpJq1a1a6SXC7e9m1IN5w3PXM2wkw5d9YyiJLUV"/>
+</div>
+<div>
+<p class="font-bold text-sm">BMW Serie 3</p>
+<p class="text-xs text-slate-500">Berlina</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-center text-sm font-medium">289</td>
+<td class="px-6 py-4 text-center text-sm font-medium">24</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<div class="w-24 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[83%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">8.3%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden">
+<img alt="Audi A3" class="w-full h-full object-cover" data-alt="Red Audi A3 Sportback" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUedB9OFJ14f9jIQ5kyoCCZYOP0kh7F-K6a7D--NLsEoeFquYaOhFGA2EnUAtzfJtgbadD7g2i-8ILWRMeGh_7096QeIJN_wRO0e6WEK7vD-Y4Bt_0B9S1N8bM-aDo6_BTjiS0NSyGN-Van-UFxFTefq04gg5Fbjg_vC95-PEKjUrkpeHIaere71DRgZpEG8_FYQ6x5q6d6I9oVFl152NNAox73-qJiCjoDVlPufUsywjuvZCaRFainiOx9a2MO7rqv776QWe2AxFw"/>
+</div>
+<div>
+<p class="font-bold text-sm">Audi A3 Sportback</p>
+<p class="text-xs text-slate-500">Compacto</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-center text-sm font-medium">245</td>
+<td class="px-6 py-4 text-center text-sm font-medium">12</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<div class="w-24 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[49%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">4.9%</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Heatmap for Activity Hours -->
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-bold">Actividad por Horas</h4>
+<div class="flex items-center gap-1">
+<span class="text-[10px] text-slate-400">Menos</span>
+<div class="size-2 rounded-sm bg-primary/10"></div>
+<div class="size-2 rounded-sm bg-primary/40"></div>
+<div class="size-2 rounded-sm bg-primary/70"></div>
+<div class="size-2 rounded-sm bg-primary"></div>
+<span class="text-[10px] text-slate-400">MÃ¡s</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<!-- Days and Hours Grid -->
+<div class="grid grid-cols-7 gap-1 text-[10px] text-center text-slate-500 mb-1">
+<span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+</div>
+<div class="flex gap-2">
+<div class="flex flex-col justify-between text-[10px] text-slate-500 py-1">
+<span>08h</span>
+<span>12h</span>
+<span>16h</span>
+<span>20h</span>
+<span>00h</span>
+</div>
+<div class="flex-1 grid grid-cols-7 grid-rows-12 gap-1">
+<!-- Generated blocks for heatmap effect -->
+<!-- Row 1 -->
+<div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/20 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/20 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div>
+<!-- Row 2 -->
+<div class="aspect-square bg-primary/40 rounded-sm"></div><div class="aspect-square bg-primary/40 rounded-sm"></div><div class="aspect-square bg-primary/60 rounded-sm"></div><div class="aspect-square bg-primary/40 rounded-sm"></div><div class="aspect-square bg-primary/50 rounded-sm"></div><div class="aspect-square bg-primary/20 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div>
+<!-- Row 3 (Midday Peak) -->
+<div class="aspect-square bg-primary/70 rounded-sm"></div><div class="aspect-square bg-primary/80 rounded-sm"></div><div class="aspect-square bg-primary/100 rounded-sm"></div><div class="aspect-square bg-primary/90 rounded-sm"></div><div class="aspect-square bg-primary/100 rounded-sm"></div><div class="aspect-square bg-primary/40 rounded-sm"></div><div class="aspect-square bg-primary/20 rounded-sm"></div>
+<!-- Row 4 -->
+<div class="aspect-square bg-primary/60 rounded-sm"></div><div class="aspect-square bg-primary/50 rounded-sm"></div><div class="aspect-square bg-primary/80 rounded-sm"></div><div class="aspect-square bg-primary/70 rounded-sm"></div><div class="aspect-square bg-primary/60 rounded-sm"></div><div class="aspect-square bg-primary/40 rounded-sm"></div><div class="aspect-square bg-primary/30 rounded-sm"></div>
+<!-- Row 5 (Evening Peak) -->
+<div class="aspect-square bg-primary/90 rounded-sm"></div><div class="aspect-square bg-primary/100 rounded-sm"></div><div class="aspect-square bg-primary/100 rounded-sm"></div><div class="aspect-square bg-primary/100 rounded-sm"></div><div class="aspect-square bg-primary/100 rounded-sm"></div><div class="aspect-square bg-primary/60 rounded-sm"></div><div class="aspect-square bg-primary/50 rounded-sm"></div>
+<!-- Row 6 -->
+<div class="aspect-square bg-primary/40 rounded-sm"></div><div class="aspect-square bg-primary/40 rounded-sm"></div><div class="aspect-square bg-primary/50 rounded-sm"></div><div class="aspect-square bg-primary/40 rounded-sm"></div><div class="aspect-square bg-primary/30 rounded-sm"></div><div class="aspect-square bg-primary/20 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div>
+<!-- Row 7 -->
+<div class="aspect-square bg-primary/20 rounded-sm"></div><div class="aspect-square bg-primary/20 rounded-sm"></div><div class="aspect-square bg-primary/30 rounded-sm"></div><div class="aspect-square bg-primary/20 rounded-sm"></div><div class="aspect-square bg-primary/20 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div>
+<!-- Row 8 -->
+<div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div><div class="aspect-square bg-primary/10 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 p-4 bg-slate-50 dark:bg-slate-700/30 rounded-lg">
+<p class="text-xs text-slate-500 leading-relaxed italic">
+<span class="material-symbols-outlined text-[14px] align-middle mr-1 text-primary">lightbulb</span>
+                            Tip: La mayor actividad ocurre los MiÃ©rcoles y Viernes entre las 11:00 y las 14:00. Considera reforzar el equipo comercial en estas franjas.
+                        </p>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto border-t border-slate-200 dark:border-slate-800 p-6 flex flex-col md:flex-row justify-between items-center text-slate-500 text-xs gap-4">
+<p>Â© 2023 Carchat AI. Todos los derechos reservados.</p>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Estado del Sistema</a>
+<a class="hover:text-primary transition-colors" href="#">DocumentaciÃ³n API</a>
+<a class="hover:text-primary transition-colors" href="#">Soporte TÃ©cnico</a>
+</div>
+</footer>
+</div>
+</body></html>
