@@ -660,6 +660,64 @@
       .ac-fab-wrapper { bottom: 18px; right: 18px; }
       .ac-fab-wrapper.open { display: none; }
     }
+
+    /* Proactive popup */
+    .ac-proactive {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      width: 260px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 20px 16px 16px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      animation: ac-pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 9999;
+    }
+    .ac-proactive-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--ac-primary);
+      background: var(--ac-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .ac-proactive-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .ac-proactive.visible { display: flex; }
+    .ac-proactive-close {
+      position: absolute;
+      top: 8px; right: 10px;
+      background: none; border: none;
+      font-size: 16px; cursor: pointer; color: #9ca3af; line-height: 1;
+    }
+    .ac-proactive-msg {
+      font-size: 14px; font-weight: 600; color: #1f2937;
+      padding-right: 16px; line-height: 1.4;
+    }
+    .ac-proactive-btn {
+      background: var(--ac-primary);
+      color: #fff; border: none; border-radius: 8px;
+      padding: 9px 12px; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-align: center;
+      transition: opacity 0.2s;
+    }
+    .ac-proactive-btn:hover { opacity: 0.85; }
+    @keyframes ac-pop-in {
+      from { opacity: 0; transform: scale(0.8) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
   `;
   shadow.appendChild(style);
 
@@ -667,6 +725,13 @@
   const container = document.createElement("div");
   container.innerHTML = `
     <div class="ac-fab-wrapper" aria-label="Chat">
+      <div class="ac-proactive" id="ac-proactive">
+        <button class="ac-proactive-close" id="ac-proactive-close">✕</button>
+        <div class="ac-proactive-avatar" id="ac-proactive-avatar">
+          <svg viewBox="0 0 24 24" style="width:26px;height:26px;fill:white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        </div>
+        <div class="ac-proactive-msg" id="ac-proactive-msg" style="text-align:center"></div>
+      </div>
       <div class="ac-fab-ring"></div>
       <div class="ac-fab-ring2"></div>
       <button class="ac-fab" aria-label="Abrir chat">
@@ -1130,12 +1195,78 @@
     input.focus();
   }
 
+  // === Proactive popup ===
+  const PROACTIVE_KEY = "autochat_proactive_shown_" + TENANT_ID;
+
+  function buildProactivePopup() {
+    const ctx = detectPageContext();
+    const proactiveEl = shadow.getElementById("ac-proactive");
+    const msgEl = shadow.getElementById("ac-proactive-msg");
+    const avatarEl = shadow.getElementById("ac-proactive-avatar");
+    if (widgetConfig.avatar_url) {
+      avatarEl.innerHTML = `<img src="${widgetConfig.avatar_url}" alt="bot" />`;
+    }
+
+    let message = "";
+    let buttons = [];
+
+    if (ctx.page_type === "vehicle_detail" && ctx.vehicle_brand && ctx.vehicle_model) {
+      const brand = ctx.vehicle_brand.replace(/-/g, " ").toUpperCase();
+      const model = ctx.vehicle_model.replace(/-/g, " ").toUpperCase();
+      message = `¿Quieres saber más cosas de este ${brand} ${model}?`;
+      buttons = [{ label: "Sí, cuéntame más", msg: `Quiero más información sobre el ${brand} ${model}` }];
+    } else {
+      message = "¡Hola! 👋 ¿Te ayudo a encontrar tu próximo coche?";
+      buttons = [
+        { label: "Buscar un coche", msg: "Quiero buscar un coche" },
+      ];
+    }
+
+    msgEl.textContent = message;
+    proactiveEl.querySelectorAll(".ac-proactive-btn").forEach(b => b.remove());
+
+    buttons.forEach(({ label, msg }) => {
+      const btn = document.createElement("button");
+      btn.className = "ac-proactive-btn";
+      btn.textContent = label;
+      btn.addEventListener("click", () => {
+        hideProactive();
+        toggleChat(true);
+        setTimeout(() => {
+          input.value = msg;
+          sendMessage();
+        }, 400);
+      });
+      proactiveEl.appendChild(btn);
+    });
+  }
+
+  function showProactive() {
+    if (isOpen) return;
+    if (sessionStorage.getItem(PROACTIVE_KEY)) return;
+    buildProactivePopup();
+    shadow.getElementById("ac-proactive").classList.add("visible");
+  }
+
+  function hideProactive() {
+    shadow.getElementById("ac-proactive").classList.remove("visible");
+    sessionStorage.setItem(PROACTIVE_KEY, "1");
+  }
+
+  setTimeout(showProactive, 6000);
+
+  shadow.getElementById("ac-proactive-close").addEventListener("click", (e) => {
+    e.stopPropagation();
+    hideProactive();
+  });
+
   // === Event listeners ===
   function toggleChat(forceOpen) {
     isOpen = forceOpen !== undefined ? forceOpen : !isOpen;
     fabWrapper.classList.toggle("open", isOpen);
     win.classList.toggle("open", isOpen);
     if (isOpen) {
+      hideProactive();
       if (messagesEl.children.length === 0) initSession();
       input.focus();
     }
