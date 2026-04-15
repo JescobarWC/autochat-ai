@@ -21,6 +21,12 @@ interface Message {
   timestamp: string | null;
 }
 
+interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 type FilterTab = "all" | "leads" | "active";
 
 function timeAgo(dateStr: string | null) {
@@ -42,21 +48,25 @@ function StatusDot({ status, lead }: { status: string; lead: boolean }) {
 
 export default function ConversationsPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
+  const [tenantFilter, setTenantFilter] = useState<string>("");
   const [search, setSearch] = useState("");
+  const [hideEmpty, setHideEmpty] = useState(true);
 
   useEffect(() => {
-    api.getConversations({ limit: "100" })
-      .then((data) => {
-        setConversations(data);
-        if (data.length > 0) setSelectedId(data[0].id);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      api.getConversations({ limit: "200" }),
+      api.getTenants(),
+    ]).then(([convs, ts]) => {
+      setConversations(convs);
+      setTenants(ts);
+      if (convs.length > 0) setSelectedId(convs[0].id);
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -70,17 +80,21 @@ export default function ConversationsPage() {
   }, [selectedId]);
 
   const selectedConv = conversations.find(c => c.id === selectedId);
+  const tenantMap = Object.fromEntries(tenants.map(t => [t.id, t.name]));
 
   const filtered = conversations.filter(c => {
     const matchFilter =
       activeFilter === "all" ||
       (activeFilter === "leads" && c.lead_captured) ||
       (activeFilter === "active" && c.status === "active");
+    const matchTenant = !tenantFilter || c.tenant_id === tenantFilter;
+    const matchEmpty = !hideEmpty || c.messages_count > 0;
     const matchSearch =
       search === "" ||
       c.session_id.toLowerCase().includes(search.toLowerCase()) ||
-      (c.page_context?.page_type || "").includes(search.toLowerCase());
-    return matchFilter && matchSearch;
+      (c.page_context?.page_type || "").includes(search.toLowerCase()) ||
+      (tenantMap[c.tenant_id] || "").toLowerCase().includes(search.toLowerCase());
+    return matchFilter && matchTenant && matchSearch && matchEmpty;
   });
 
   return (
@@ -116,6 +130,28 @@ export default function ConversationsPage() {
               </button>
             ))}
           </div>
+          <div className="mt-3 flex items-center justify-between px-1">
+            <span className="text-xs text-slate-500">Ocultar sin mensajes</span>
+            <button
+              type="button"
+              onClick={() => setHideEmpty(!hideEmpty)}
+              className={`relative w-9 h-5 rounded-full transition-colors ${hideEmpty ? "bg-primary" : "bg-slate-300 dark:bg-slate-600"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${hideEmpty ? "translate-x-4" : ""}`} />
+            </button>
+          </div>
+          {tenants.length > 1 && (
+            <select
+              value={tenantFilter}
+              onChange={e => setTenantFilter(e.target.value)}
+              className="mt-3 w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/50"
+            >
+              <option value="">Todos los tenants</option>
+              {tenants.map(t => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto">
@@ -136,9 +172,9 @@ export default function ConversationsPage() {
                   key={conv.id}
                   onClick={() => setSelectedId(conv.id)}
                   className={`p-4 flex gap-3 cursor-pointer transition-colors border-l-4 ${
-                    isLead ? "border-amber-400 bg-amber-400/5" :
-                    isActive ? "border-primary bg-primary/5" :
-                    isSelected ? "border-slate-300 bg-slate-50 dark:bg-slate-800/50" :
+                    isSelected ? (isLead ? "border-amber-400 bg-amber-400/10" : isActive ? "border-primary bg-primary/10" : "border-slate-300 bg-slate-50 dark:bg-slate-800/50") :
+                    isLead ? "border-amber-400/50 hover:bg-amber-400/5" :
+                    isActive ? "border-primary/50 hover:bg-primary/5" :
                     "border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/30"
                   }`}
                 >
@@ -155,15 +191,18 @@ export default function ConversationsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start mb-0.5">
                       <span className="text-sm font-bold truncate">
-                        {conv.page_context?.page_type ? `Visita — ${conv.page_context.page_type}` : `Sesión ${conv.session_id.slice(0, 8)}`}
+                        {tenantMap[conv.tenant_id] || "—"}
                       </span>
                       <span className="text-[10px] text-slate-500 shrink-0 ml-2">{timeAgo(conv.last_message_at)}</span>
                     </div>
+                    <p className="text-xs text-slate-500 truncate mb-0.5">
+                      {conv.page_context?.page_type ? `${conv.page_context.page_type}` : conv.session_id.slice(0, 12)}
+                    </p>
                     <div className="flex items-center gap-1.5">
                       {isLead && <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">Lead ✓</span>}
                       {isActive && <span className="text-[10px] font-bold text-primary uppercase tracking-wide">Activa</span>}
                       {!isLead && !isActive && <span className="text-[10px] text-slate-400 uppercase tracking-wide">Finalizada</span>}
-                      <span className="text-[10px] text-slate-400">· {conv.messages_count} msgs</span>
+                      {conv.messages_count > 0 && <span className="text-[10px] text-slate-400">· {conv.messages_count} msgs</span>}
                     </div>
                   </div>
                 </div>
@@ -189,9 +228,8 @@ export default function ConversationsPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-sm">
-                    {selectedConv.page_context?.page_type
-                      ? `Visita — ${selectedConv.page_context.page_type}`
-                      : `Sesión ${selectedConv.session_id.slice(0, 12)}`}
+                    {tenantMap[selectedConv.tenant_id] || "—"}
+                    <span className="text-slate-400 font-normal ml-2 text-xs">{selectedConv.page_context?.page_type || ""}</span>
                   </h4>
                   <div className="flex items-center gap-2">
                     {selectedConv.lead_captured && (
@@ -210,7 +248,7 @@ export default function ConversationsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">{selectedConv.messages_count} mensajes</span>
+                {selectedConv.messages_count > 0 && <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">{selectedConv.messages_count} mensajes</span>}
                 <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">{timeAgo(selectedConv.started_at)}</span>
               </div>
             </div>
@@ -224,8 +262,8 @@ export default function ConversationsPage() {
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-32 gap-2 text-slate-400">
                   <span className="material-symbols-outlined" style={{ fontSize: "32px" }}>chat_bubble_outline</span>
-                  <p className="text-sm">Sin historial disponible</p>
-                  <p className="text-xs text-slate-300 dark:text-slate-600">Los mensajes se almacenan 30 min en Redis</p>
+                  <p className="text-sm">Sin mensajes en esta conversación</p>
+                  <p className="text-xs text-slate-300 dark:text-slate-600">El usuario abrió el chat pero no escribió</p>
                 </div>
               ) : (
                 messages.map((msg, i) => (

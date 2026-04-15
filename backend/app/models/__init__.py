@@ -10,6 +10,8 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 
+from pgvector.sqlalchemy import Vector
+
 from app.database import Base
 
 
@@ -103,3 +105,36 @@ class UsageMetric(Base):
     __table_args__ = (UniqueConstraint("tenant_id", "date"),)
 
     tenant = relationship("Tenant", back_populates="usage_metrics")
+
+
+class KnowledgeDocument(Base):
+    __tablename__ = "knowledge_documents"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    filename = Column(String(500), nullable=False)
+    original_filename = Column(String(500), nullable=False)
+    file_size = Column(Integer, default=0)
+    mime_type = Column(String(100))
+    status = Column(String(50), default="processing")
+    chunk_count = Column(Integer, default=0)
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    chunks = relationship("KnowledgeChunk", back_populates="document", cascade="all, delete-orphan")
+
+
+class KnowledgeChunk(Base):
+    __tablename__ = "knowledge_chunks"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id = Column(UUID(as_uuid=True), ForeignKey("knowledge_documents.id", ondelete="CASCADE"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    chunk_index = Column(Integer, nullable=False)
+    content = Column(Text, nullable=False)
+    embedding = Column(Vector(1536))
+    token_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    document = relationship("KnowledgeDocument", back_populates="chunks")

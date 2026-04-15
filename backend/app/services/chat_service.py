@@ -155,7 +155,7 @@ class ChatService:
             vehicle_id = page_context.get("vehicle_id", "")
             system_prompt = build_system_prompt(config, page_context)
             try:
-                proactive = await self.client.chat.completions.create(
+                proactive = await self.openai.chat.completions.create(
                     model=settings.openai_model,
                     messages=[
                         {"role": "system", "content": system_prompt},
@@ -200,6 +200,9 @@ class ChatService:
                 "position": widget_theme.get("position", "bottom-right"),
                 "welcome_message": widget_theme.get("welcome_message", "¡Hola! ¿En qué puedo ayudarte?"),
                 "show_powered_by": widget_theme.get("show_powered_by", True),
+                "avatar_url": widget_theme.get("avatar_url", ""),
+                "logo_url": widget_theme.get("logo_url", ""),
+                "enable_cart": config.get("enable_cart", False),
             },
             "history": frontend_history,
         }
@@ -211,7 +214,18 @@ class ChatService:
         # Recuperar historial
         history = await self.get_history(session_id)
         config = self.tenant.get("config", {})
-        system_prompt = build_system_prompt(config, page_context)
+
+        # Knowledge base search
+        knowledge_context = None
+        try:
+            from app.services.knowledge_service import search_knowledge
+            chunks = await search_knowledge(self.db, self.tenant_id, message, top_k=5)
+            if chunks:
+                knowledge_context = "\n\n---\n\n".join(c["content"] for c in chunks)
+        except Exception as e:
+            logger.warning(f"Error en búsqueda de conocimiento: {e}")
+
+        system_prompt = build_system_prompt(config, page_context, knowledge_context=knowledge_context)
 
         # Añadir mensaje del usuario
         history.append({

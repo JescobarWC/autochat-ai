@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TUCARS | Coches de Ocasión en Madrid</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400; }
+</style>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: '#dc2626',
+        'brand-dark': '#b91c1c',
+      }
+    }
+  }
+}
+</script>
+</head>
+<body class="bg-white text-slate-800">
+
+<!-- Aviso Demo -->
+<div class="bg-blue-600 text-white text-center py-2 text-sm font-medium">
+  <span class="material-symbols-outlined text-sm align-middle mr-1">info</span>
+  Esto es una demo interactiva de <a href="https://chat.eaistudio.es" class="underline font-bold">AutoChat AI</a>. Prueba el chatbot hablando con el asistente de este concesionario ficticio.
+</div>
+
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+<div class="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
+  <div class="flex items-center gap-2">
+    <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center">
+      <span class="material-symbols-outlined text-white">directions_car</span>
+    </div>
+    <span class="text-2xl font-black tracking-tight">TU<span class="text-brand">CARS</span></span>
+  </div>
+  <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+    <a href="#coches" class="hover:text-brand transition-colors">Coches</a>
+    <a href="#financiacion" class="hover:text-brand transition-colors">Financiación</a>
+    <a href="#contacto" class="hover:text-brand transition-colors">Contacto</a>
+  </nav>
+  <a href="tel:+34915551234" class="hidden md:flex items-center gap-2 text-sm font-bold text-brand">
+    <span class="material-symbols-outlined text-lg">call</span>
+    91 555 12 34
+  </a>
+</div>
+</header>
+
+<!-- Hero -->
+<section class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-16 md:py-24">
+<div class="max-w-7xl mx-auto px-4 md:px-8 text-center">
+  <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-4">Tu próximo coche <span class="text-brand">te espera</span></h1>
+  <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8">Más de 200 vehículos de ocasión revisados y garantizados. Financiación a tu medida y entrega en toda España.</p>
+  <div class="flex flex-wrap gap-4 justify-center">
+    <a href="#coches" class="px-8 py-3.5 bg-brand text-white font-bold rounded-xl hover:bg-brand-dark transition-colors">Ver coches</a>
+    <a href="#financiacion" class="px-8 py-3.5 border border-slate-600 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors">Calcular financiación</a>
+  </div>
+  <div class="flex justify-center gap-8 mt-12 text-sm text-slate-500">
+    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-brand">verified</span> 12 meses garantía</div>
+    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-brand">local_shipping</span> Entrega a domicilio</div>
+    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-brand">payments</span> Financiación flexible</div>
+  </div>
+</div>
+</section>
+
+<!-- Coches -->
+<section class="py-16 md:py-20 bg-slate-50" id="coches">
+<div class="max-w-7xl mx-auto px-4 md:px-8">
+  <div class="flex items-center justify-between mb-10">
+    <div>
+      <h2 class="text-2xl md:text-3xl font-extrabold">Nuestro Stock</h2>
+      <p class="text-slate-500 text-sm mt-1">Vehículos revisados con garantía incluida</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <!-- Audi Q5 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group" data-vehicle-id="3361877" data-vehicle-brand="audi" data-vehicle-model="q5">
+      <div class="aspect-[4/3] bg-slate-100 overflow-hidden">
+        <img src="https://placehold.co/600x450/1e293b/ffffff?text=Audi+Q5+2.0+TDI" alt="Audi Q5" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      </div>
+      <div class="p-5">
+        <h3 class="font-bold text-lg">Audi Q5 2.0 TDI Quattro</h3>
+        <div class="flex flex-wrap gap-2 mt-2 text-xs text-slate-500">
+          <span class="bg-slate-100 px-2 py-1 rounded">2021</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">45.000 km</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Diésel</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Automático</span>
+        </div>
+        <div class="flex items-end justify-between mt-4">
+          <div>
+            <p class="text-2xl font-black text-brand">32.900 €</p>
+            <p class="text-xs text-slate-400">Desde 575 €/mes</p>
+          </div>
+          <button class="px-4 py-2 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-dark transition-colors">Ver ficha</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BMW Serie 3 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group" data-vehicle-id="3361878" data-vehicle-brand="bmw" data-vehicle-model="serie-3">
+      <div class="aspect-[4/3] bg-slate-100 overflow-hidden">
+        <img src="https://placehold.co/600x450/1e293b/ffffff?text=BMW+320d+xDrive" alt="BMW Serie 3" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      </div>
+      <div class="p-5">
+        <h3 class="font-bold text-lg">BMW Serie 3 320d xDrive</h3>
+        <div class="flex flex-wrap gap-2 mt-2 text-xs text-slate-500">
+          <span class="bg-slate-100 px-2 py-1 rounded">2022</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">28.000 km</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Diésel</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Automático</span>
+        </div>
+        <div class="flex items-end justify-between mt-4">
+          <div>
+            <p class="text-2xl font-black text-brand">35.500 €</p>
+            <p class="text-xs text-slate-400">Desde 620 €/mes</p>
+          </div>
+          <button class="px-4 py-2 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-dark transition-colors">Ver ficha</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mercedes GLC -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group" data-vehicle-id="3361879" data-vehicle-brand="mercedes" data-vehicle-model="glc">
+      <div class="aspect-[4/3] bg-slate-100 overflow-hidden">
+        <img src="https://placehold.co/600x450/1e293b/ffffff?text=Mercedes+GLC+300d" alt="Mercedes GLC" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      </div>
+      <div class="p-5">
+        <h3 class="font-bold text-lg">Mercedes GLC 300d 4Matic</h3>
+        <div class="flex flex-wrap gap-2 mt-2 text-xs text-slate-500">
+          <span class="bg-slate-100 px-2 py-1 rounded">2020</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">62.000 km</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Diésel</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Automático</span>
+        </div>
+        <div class="flex items-end justify-between mt-4">
+          <div>
+            <p class="text-2xl font-black text-brand">38.900 €</p>
+            <p class="text-xs text-slate-400">Desde 680 €/mes</p>
+          </div>
+          <button class="px-4 py-2 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-dark transition-colors">Ver ficha</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toyota RAV4 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group" data-vehicle-id="3361880" data-vehicle-brand="toyota" data-vehicle-model="rav4">
+      <div class="aspect-[4/3] bg-slate-100 overflow-hidden">
+        <img src="https://placehold.co/600x450/1e293b/ffffff?text=Toyota+RAV4+Hybrid" alt="Toyota RAV4" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      </div>
+      <div class="p-5">
+        <h3 class="font-bold text-lg">Toyota RAV4 2.5 Hybrid AWD</h3>
+        <div class="flex flex-wrap gap-2 mt-2 text-xs text-slate-500">
+          <span class="bg-slate-100 px-2 py-1 rounded">2022</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">25.000 km</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Híbrido</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Automático</span>
+        </div>
+        <div class="flex items-end justify-between mt-4">
+          <div>
+            <p class="text-2xl font-black text-brand">34.900 €</p>
+            <p class="text-xs text-slate-400">Desde 610 €/mes</p>
+          </div>
+          <button class="px-4 py-2 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-dark transition-colors">Ver ficha</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tesla Model 3 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group" data-vehicle-id="3361881" data-vehicle-brand="tesla" data-vehicle-model="model-3">
+      <div class="aspect-[4/3] bg-slate-100 overflow-hidden">
+        <img src="https://placehold.co/600x450/1e293b/ffffff?text=Tesla+Model+3+LR" alt="Tesla Model 3" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      </div>
+      <div class="p-5">
+        <h3 class="font-bold text-lg">Tesla Model 3 Long Range</h3>
+        <div class="flex flex-wrap gap-2 mt-2 text-xs text-slate-500">
+          <span class="bg-slate-100 px-2 py-1 rounded">2022</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">30.000 km</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Eléctrico</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Automático</span>
+        </div>
+        <div class="flex items-end justify-between mt-4">
+          <div>
+            <p class="text-2xl font-black text-brand">36.900 €</p>
+            <p class="text-xs text-slate-400">Desde 645 €/mes</p>
+          </div>
+          <button class="px-4 py-2 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-dark transition-colors">Ver ficha</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VW Golf -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow group" data-vehicle-id="3361882" data-vehicle-brand="volkswagen" data-vehicle-model="golf">
+      <div class="aspect-[4/3] bg-slate-100 overflow-hidden">
+        <img src="https://placehold.co/600x450/1e293b/ffffff?text=VW+Golf+2.0+TDI" alt="Volkswagen Golf" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      </div>
+      <div class="p-5">
+        <h3 class="font-bold text-lg">Volkswagen Golf 2.0 TDI DSG</h3>
+        <div class="flex flex-wrap gap-2 mt-2 text-xs text-slate-500">
+          <span class="bg-slate-100 px-2 py-1 rounded">2021</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">38.000 km</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Diésel</span>
+          <span class="bg-slate-100 px-2 py-1 rounded">Automático</span>
+        </div>
+        <div class="flex items-end justify-between mt-4">
+          <div>
+            <p class="text-2xl font-black text-brand">24.900 €</p>
+            <p class="text-xs text-slate-400">Desde 435 €/mes</p>
+          </div>
+          <button class="px-4 py-2 bg-brand text-white text-sm font-bold rounded-lg hover:bg-brand-dark transition-colors">Ver ficha</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- Financiación -->
+<section class="py-16 md:py-20" id="financiacion">
+<div class="max-w-4xl mx-auto px-4 md:px-8 text-center">
+  <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Financiación a tu medida</h2>
+  <p class="text-slate-500 max-w-xl mx-auto mb-10">Trabajamos con las principales financieras para ofrecerte las mejores condiciones. Respuesta en 24h y sin sorpresas.</p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+      <div class="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+        <span class="material-symbols-outlined text-brand">percent</span>
+      </div>
+      <h3 class="font-bold mb-2">Desde 4,99% TAE</h3>
+      <p class="text-sm text-slate-500">Las mejores condiciones del mercado adaptadas a tu perfil.</p>
+    </div>
+    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+      <div class="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+        <span class="material-symbols-outlined text-brand">calendar_month</span>
+      </div>
+      <h3 class="font-bold mb-2">Hasta 96 meses</h3>
+      <p class="text-sm text-slate-500">Elige el plazo que mejor se ajuste a tu presupuesto mensual.</p>
+    </div>
+    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+      <div class="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+        <span class="material-symbols-outlined text-brand">swap_horiz</span>
+      </div>
+      <h3 class="font-bold mb-2">Aceptamos tu coche</h3>
+      <p class="text-sm text-slate-500">Tasamos tu vehículo actual como parte del pago.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Contacto -->
+<section class="py-16 md:py-20 bg-slate-900 text-white" id="contacto">
+<div class="max-w-4xl mx-auto px-4 md:px-8 text-center">
+  <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Visítanos en Madrid</h2>
+  <p class="text-slate-400 mb-8">Av. de la Ilustración 32, 28023 Madrid</p>
+  <div class="flex flex-wrap justify-center gap-8 text-sm text-slate-400">
+    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-brand">call</span> +34 91 555 12 34</div>
+    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-brand">mail</span> info@tucars.es</div>
+    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-brand">schedule</span> L-V 9-20h · S 10-14h</div>
+  </div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-slate-950 text-slate-500 text-center py-6 text-xs">
+  <p>&copy; 2026 TUCARS — Concesionario ficticio creado para demostrar <a href="https://chat.eaistudio.es" class="text-blue-400 hover:underline">AutoChat AI</a></p>
+</footer>
+
+<!-- AutoChat AI Widget -->
+<script src="/widget/dist/widget.min.js" data-tenant="dd7f9a78-bc19-4791-854e-180d6c106e48" data-api="https://chat.eaistudio.es/api/v1"></script>
+
+</body>
+</html>

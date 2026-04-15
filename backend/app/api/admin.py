@@ -1,3 +1,4 @@
+from app.utils import validate_webhook_url
 """Endpoints del panel de administración — CRUD tenants, conversations, leads, auth."""
 
 import json
@@ -80,6 +81,151 @@ async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)):
     return {"token": token, "user": {"email": user.email, "full_name": user.full_name, "role": user.role}}
 
 
+
+# === Settings ===
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@router.post("/settings/change-password", summary="Cambiar contrase\u00f1a del admin")
+async def change_password(
+    body: ChangePasswordRequest,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+):
+    if not bcrypt.checkpw(body.current_password.encode("utf-8"), admin.password_hash.encode("utf-8")):
+        raise HTTPException(status_code=400, detail="Contrase\u00f1a actual incorrecta")
+    if len(body.new_password) < 8:
+        raise HTTPException(status_code=400, detail="La nueva contrase\u00f1a debe tener al menos 8 caracteres")
+    new_hash = bcrypt.hashpw(body.new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    admin.password_hash = new_hash
+    await db.commit()
+    return {"ok": True}
+
+
+
+# === Users ===
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: str
+    role: str = "admin"  # "superadmin" or "admin"
+    tenant_id: Optional[UUID] = None
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    role: Optional[str] = None
+    is_active: Optional[bool] = None
+    tenant_id: Optional[UUID] = None
+
+@router.get("/users", summary="Listar usuarios admin")
+async def list_users(
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+):
+    if admin.role != "superadmin":
+        raise HTTPException(status_code=403, detail="Solo superadmin puede gestionar usuarios")
+    result = await db.execute(select(AdminUser).order_by(AdminUser.created_at.desc()))
+    users = result.scalars().all()
+    return [
+        {
+            "id": str(u.id),
+            "email": u.email,
+            "full_name": u.full_name,
+            "role": u.role,
+            "is_active": u.is_active,
+            "tenant_id": str(u.tenant_id) if u.tenant_id else None,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+        }
+        for u in users
+    ]
+
+@router.post("/users", status_code=201, summary="Crear usuario admin")
+async def create_user(
+    body: UserCreate,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+):
+    if admin.role != "superadmin":
+        raise HTTPException(status_code=403, detail="Solo superadmin puede crear usuarios")
+    if len(body.password) < 8:
+        raise HTTPException(status_code=400, detail="La contrase\u00f1a debe tener al menos 8 caracteres")
+    # Check duplicate
+    existing = await db.execute(select(AdminUser).where(AdminUser.email == body.email))
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=409, detail="Ya existe un usuario con ese email")
+    
+    pw_hash = bcrypt.hashpw(body.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    user = AdminUser(
+        email=body.email,
+        password_hash=pw_hash,
+        full_name=body.full_name,
+        role=body.role,
+        tenant_id=body.tenant_id if body.role in ("admin", "user") else None,
+    )
+    db.add(user)
+    await db.commit()
+    return {"id": str(user.id), "email": user.email}
+
+@router.patch("/users/{user_id}", summary="Actualizar usuario")
+async def update_user(
+    user_id: UUID,
+    body: UserUpdate,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+):
+    if admin.role != "superadmin":
+        raise HTTPException(status_code=403, detail="Solo superadmin puede editar usuarios")
+    result = await db.execute(select(AdminUser).where(AdminUser.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    update_data = body.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(user, key, value)
+    await db.commit()
+    return {"ok": True}
+
+class ResetPasswordRequest(BaseModel):
+    new_password: str
+
+@router.post("/users/{user_id}/reset-password", summary="Resetear contrase\u00f1a de un usuario")
+async def reset_user_password(
+    user_id: UUID,
+    body: ResetPasswordRequest,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+):
+    if admin.role != "superadmin":
+        raise HTTPException(status_code=403, detail="Solo superadmin puede resetear contrase\u00f1as")
+    if len(body.new_password) < 8:
+        raise HTTPException(status_code=400, detail="La contrase\u00f1a debe tener al menos 8 caracteres")
+    result = await db.execute(select(AdminUser).where(AdminUser.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    user.password_hash = bcrypt.hashpw(body.new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    await db.commit()
+    return {"ok": True}
+
+@router.delete("/users/{user_id}", summary="Eliminar usuario")
+async def delete_user(
+    user_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin),
+):
+    if admin.role != "superadmin":
+        raise HTTPException(status_code=403, detail="Solo superadmin puede eliminar usuarios")
+    result = await db.execute(select(AdminUser).where(AdminUser.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    if str(user.id) == str(admin.id):
+        raise HTTPException(status_code=400, detail="No puedes eliminarte a ti mismo")
+    await db.delete(user)
+    await db.commit()
+    return {"ok": True}
+
 # === Tenants ===
 
 @router.get("/tenants", summary="Listar todos los tenants")
@@ -87,7 +233,10 @@ async def list_tenants(
     db: AsyncSession = Depends(get_db),
     admin: AdminUser = Depends(get_current_admin),
 ):
-    result = await db.execute(select(Tenant).order_by(Tenant.created_at.desc()))
+    query = select(Tenant).order_by(Tenant.created_at.desc())
+    if admin.role != "superadmin" and admin.tenant_id:
+        query = query.where(Tenant.id == admin.tenant_id)
+    result = await db.execute(query)
     tenants = result.scalars().all()
     return [
         {
@@ -241,26 +390,32 @@ async def get_conversation_messages(
     if not conv:
         raise HTTPException(status_code=404, detail="Conversación no encontrada")
 
+    # Intentar primero Redis (mensajes en tiempo real)
     redis_key = f"tenant:{conv.tenant_id}:session:{conv.session_id}"
     raw = await redis.get(redis_key)
-    if not raw:
-        return []
 
-    history = json.loads(raw)
-    messages = []
-    for msg in history:
-        role = msg.get("role")
-        if role not in ("user", "assistant"):
-            continue
-        content = msg.get("content", "")
-        if not content:
-            continue
-        messages.append({
-            "role": role,
-            "content": content,
-            "timestamp": msg.get("timestamp"),
-        })
-    return messages
+    if raw:
+        history = json.loads(raw)
+        messages = []
+        for msg in history:
+            role = msg.get("role")
+            if role not in ("user", "assistant"):
+                continue
+            content = msg.get("content", "")
+            if not content:
+                continue
+            messages.append({
+                "role": role,
+                "content": content,
+                "timestamp": msg.get("timestamp"),
+            })
+        return messages
+
+    # Fallback: leer de PostgreSQL (mensajes persistidos)
+    if conv.messages_json:
+        return conv.messages_json
+
+    return []
 
 
 # === Leads ===
@@ -275,6 +430,8 @@ async def list_leads(
     admin: AdminUser = Depends(get_current_admin),
 ):
     query = select(Lead).order_by(Lead.created_at.desc())
+    if admin.role != "superadmin" and admin.tenant_id:
+        query = query.where(Lead.tenant_id == admin.tenant_id)
     if tenant_id:
         query = query.where(Lead.tenant_id == tenant_id)
     if status:
@@ -297,7 +454,8 @@ async def list_leads(
             "interest_type": l.interest_type,
             "notes": l.notes,
             "status": l.status,
-            "created_at": l.created_at.isoformat() if l.created_at else None,
+            "created_at": l.created_at.isoformat(),
+                "utm_data": l.utm_data if hasattr(l, "utm_data") else None if l.created_at else None,
         }
         for l in leads
     ]
@@ -322,6 +480,10 @@ async def send_lead_to_crm(
 
         cfg = tenant.config or {}
         webhook_url = (cfg.get("webhook_url") or "").strip()
+        try:
+            validate_webhook_url(webhook_url)
+        except ValueError as ve:
+            raise HTTPException(status_code=400, detail=f"URL de webhook no válida: {ve}")
         if not webhook_url:
             raise HTTPException(status_code=400, detail="No hay webhook_url configurado en este tenant")
 
@@ -382,7 +544,11 @@ async def send_lead_to_crm(
             else:
                 payload = mapped
         else:
-            payload = {"event": "lead_captured", "tenant_id": str(lead.tenant_id), "lead": lead_data}
+            if cfg.get("webhook_lead_string"):
+                import json as _json
+                payload = {"lead": _json.dumps(lead_data, ensure_ascii=False)}
+            else:
+                payload = {"event": "lead_captured", "tenant_id": str(lead.tenant_id), "lead": lead_data}
 
         headers = {"Content-Type": "application/json"}
         custom_headers = cfg.get("webhook_headers") or {}
@@ -397,7 +563,7 @@ async def send_lead_to_crm(
         raise
     except Exception as e:
         logger.error(f"Error en send_lead_to_crm: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 
 # === Analytics ===
@@ -421,10 +587,23 @@ async def analytics_overview(
     result = await db.execute(query)
     metrics = result.scalars().all()
 
+    # Totales reales desde las tablas de conversaciones y leads
+    conv_query = select(func.count()).select_from(Conversation).where(Conversation.messages_count > 0)
+    if admin.role != "superadmin" and admin.tenant_id:
+        query = query.where(UsageMetric.tenant_id == admin.tenant_id)
+        conv_query = conv_query.where(Conversation.tenant_id == admin.tenant_id)
+    leads_query = select(func.count()).select_from(Lead)
+    if tenant_id:
+        conv_query = conv_query.where(Conversation.tenant_id == tenant_id)
+        leads_query = leads_query.where(Lead.tenant_id == tenant_id)
+
+    real_convs = (await db.execute(conv_query)).scalar() or 0
+    real_leads = (await db.execute(leads_query)).scalar() or 0
+
     totals = {
-        "total_conversations": sum(m.total_conversations for m in metrics),
+        "total_conversations": real_convs,
         "total_messages": sum(m.total_messages for m in metrics),
-        "total_leads": sum(m.total_leads for m in metrics),
+        "total_leads": real_leads,
         "tokens_input": sum(m.tokens_input for m in metrics),
         "tokens_output": sum(m.tokens_output for m in metrics),
     }
@@ -476,6 +655,10 @@ async def test_webhook(
     webhook_url = (cfg.get("webhook_url") or "").strip()
     if not webhook_url:
         raise HTTPException(status_code=400, detail="No hay webhook_url configurado")
+    try:
+        validate_webhook_url(webhook_url)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=f"URL de webhook no v\u00e1lida: {ve}")
 
     lead_data = {
         "name": "Carlos García (TEST)",
@@ -520,11 +703,15 @@ async def test_webhook(
         else:
             payload = mapped
     else:
-        payload = {
-            "event": "lead_captured",
-            "tenant_id": str(tenant_id),
-            "lead": lead_data,
-        }
+        if cfg.get("webhook_lead_string"):
+            import json as _json
+            payload = {"lead": _json.dumps(lead_data, ensure_ascii=False)}
+        else:
+            payload = {
+                "event": "lead_captured",
+                "tenant_id": str(tenant_id),
+                "lead": lead_data,
+            }
 
     # Cabeceras personalizadas
     headers = {"Content-Type": "application/json"}
@@ -583,6 +770,6 @@ async def run_migrations(
             await db.execute(text(sql))
             results.append({"sql": sql, "ok": True})
         except Exception as e:
-            results.append({"sql": sql, "ok": False, "error": str(e)})
+            results.append({"sql": sql, "ok": False, "error": "Error al ejecutar migracion"})
     await db.commit()
     return {"migrations": results}

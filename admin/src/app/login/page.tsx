@@ -20,7 +20,7 @@ export default function LoginPage() {
       const data = await api.login(email, password);
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      router.push("/");
+      router.push("/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error de conexion");
     } finally {
@@ -88,11 +88,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 pt-4 border-t border-slate-800">
-            <p className="text-xs text-slate-600 text-center">
-              Credenciales de demo: admin@autochat.ai / admin123
-            </p>
-          </div>
         </div>
       </div>
     </div>

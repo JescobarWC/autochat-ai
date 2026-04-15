@@ -8,6 +8,12 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-display" });
 export const metadata: Metadata = {
   title: "EAI-STUDIO Chat — Admin",
   description: "Panel de administracion de EAI-STUDIO Chat",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

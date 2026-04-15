@@ -47,6 +47,10 @@ function heatOpacity(val: number): string {
 export default function AnalyticsPage() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dailyPage, setDailyPage] = useState(1);
+  const [dailyPerPage, setDailyPerPage] = useState(10);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     api.getAnalytics()
@@ -65,7 +69,7 @@ export default function AnalyticsPage() {
     : "0";
 
   const tokenCost = totals
-    ? ((totals.tokens_input * 0.01 + totals.tokens_output * 0.03) / 1000).toFixed(2)
+    ? ((totals.tokens_input * 0.0004 + totals.tokens_output * 0.0016) / 1000).toFixed(2)
     : "0.00";
 
   const KPI_CARDS = [
@@ -184,34 +188,94 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Heatmap */}
-      <div className="bg-white dark:bg-card-dark p-6 rounded-xl border border-slate-200 dark:border-slate-700">
-        <div className="flex justify-between items-center mb-6">
-          <h4 className="font-bold">Actividad por Horas (estimado)</h4>
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] text-slate-400">Menos</span>
-            {[10, 40, 70, 100].map(v => <div key={v} className={`size-2 rounded-sm ${heatOpacity(v)}`} />)}
-            <span className="text-[10px] text-slate-400">Más</span>
-          </div>
-        </div>
-        <div className="flex flex-col gap-1">
-          <div className="grid grid-cols-7 gap-1 text-[10px] text-center text-slate-500 mb-1 ml-8">
-            {HEATMAP_DAYS.map(d => <span key={d}>{d}</span>)}
-          </div>
-          <div className="flex gap-2">
-            <div className="flex flex-col justify-between text-[10px] text-slate-500 py-0.5 w-6 shrink-0">
-              {HEATMAP_HOURS.map(h => <span key={h}>{h}</span>)}
+      {/* Daily breakdown */}
+      {(() => {
+        const reversed = daily.slice().reverse();
+        const filtered = reversed.filter(d => {
+          if (dateFrom && d.date < dateFrom) return false;
+          if (dateTo && d.date > dateTo) return false;
+          return true;
+        });
+        const totalPages = Math.ceil(filtered.length / dailyPerPage);
+        const paginated = filtered.slice((dailyPage - 1) * dailyPerPage, dailyPage * dailyPerPage);
+
+        return (
+        <div className="bg-white dark:bg-card-dark rounded-xl border border-slate-200 dark:border-slate-700">
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold">Desglose diario</h4>
+              <select
+                value={dailyPerPage}
+                onChange={e => { setDailyPerPage(Number(e.target.value)); setDailyPage(1); }}
+                className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium focus:outline-none"
+              >
+                <option value={10}>10 / pág</option>
+                <option value={20}>20 / pág</option>
+                <option value={50}>50 / pág</option>
+              </select>
             </div>
-            <div className="flex-1 grid grid-cols-7 grid-rows-8 gap-1">
-              {HEATMAP_ROWS.map((row, ri) =>
-                row.map((val, ci) => (
-                  <div key={`${ri}-${ci}`} className={`aspect-square rounded-sm ${heatOpacity(val)}`} />
-                ))
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-slate-500">Desde</label>
+                <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setDailyPage(1); }} className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-slate-500">Hasta</label>
+                <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setDailyPage(1); }} className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              {(dateFrom || dateTo) && (
+                <button onClick={() => { setDateFrom(""); setDateTo(""); setDailyPage(1); }} className="text-xs text-primary font-medium hover:underline">Limpiar</button>
               )}
             </div>
           </div>
+          {filtered.length === 0 ? (
+            <p className="text-sm text-slate-400 text-center py-8">Sin datos en este rango</p>
+          ) : (
+            <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs text-slate-500 uppercase tracking-wider border-y border-slate-200 dark:border-slate-700">
+                    <th className="text-left py-3 px-4">Fecha</th>
+                    <th className="text-right py-3 px-4">Conversaciones</th>
+                    <th className="text-right py-3 px-4">Mensajes</th>
+                    <th className="text-right py-3 px-4">Leads</th>
+                    <th className="text-right py-3 px-4">Tokens</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.map((d) => (
+                    <tr key={d.date} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                      <td className="py-3 px-4 font-medium">{new Date(d.date).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}</td>
+                      <td className="py-3 px-4 text-right">{d.conversations}</td>
+                      <td className="py-3 px-4 text-right">{d.messages}</td>
+                      <td className="py-3 px-4 text-right">{d.leads > 0 ? <span className="text-emerald-600 font-bold">{d.leads}</span> : "0"}</td>
+                      <td className="py-3 px-4 text-right text-slate-400">{(d.tokens_input + d.tokens_output).toLocaleString("es-ES")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-xs text-slate-500">{Math.min((dailyPage - 1) * dailyPerPage + 1, filtered.length)}–{Math.min(dailyPage * dailyPerPage, filtered.length)} de {filtered.length}</p>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setDailyPage(p => Math.max(1, p - 1))} disabled={dailyPage === 1} className="px-2 py-1 text-xs font-medium rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-colors"><span className="material-symbols-outlined text-sm">chevron_left</span></button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).filter(p => p === 1 || p === totalPages || Math.abs(p - dailyPage) <= 1).map((p, i, arr) => (
+                    <span key={p}>
+                      {i > 0 && arr[i - 1] !== p - 1 && <span className="text-xs text-slate-400 px-1">...</span>}
+                      <button onClick={() => setDailyPage(p)} className={`w-7 h-7 text-xs font-medium rounded transition-colors ${p === dailyPage ? "bg-primary text-white" : "hover:bg-slate-100 dark:hover:bg-slate-800"}`}>{p}</button>
+                    </span>
+                  ))}
+                  <button onClick={() => setDailyPage(p => Math.min(totalPages, p + 1))} disabled={dailyPage === totalPages} className="px-2 py-1 text-xs font-medium rounded hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 transition-colors"><span className="material-symbols-outlined text-sm">chevron_right</span></button>
+                </div>
+              </div>
+            )}
+            </>
+          )}
         </div>
-      </div>
+        );
+      })()}
     </>
   );
 }

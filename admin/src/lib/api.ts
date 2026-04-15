@@ -76,4 +76,36 @@ export const api = {
   // Send lead to CRM manually
   sendLeadToCrm: (leadId: string) =>
     request(`/admin/leads/${leadId}/send-to-crm`, { method: "POST", body: "{}" }),
+
+  // Users
+  getUsers: () => request("/admin/users"),
+  createUser: (data: Record<string, unknown>) =>
+    request("/admin/users", { method: "POST", body: JSON.stringify(data) }),
+  updateUser: (id: string, data: Record<string, unknown>) =>
+    request(`/admin/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  resetUserPassword: (id: string, newPassword: string) =>
+    request(`/admin/users/${id}/reset-password`, { method: "POST", body: JSON.stringify({ new_password: newPassword }) }),
+  deleteUser: (id: string) =>
+    request(`/admin/users/${id}`, { method: "DELETE" }),
+
+  // Knowledge base
+  getKnowledgeDocs: (tenantId: string) =>
+    request(`/admin/tenants/${tenantId}/knowledge`),
+  uploadKnowledgeDoc: async (tenantId: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const res = await fetch(`${API_BASE}/admin/tenants/${tenantId}/knowledge/upload`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.detail || `Error ${res.status}`);
+    }
+    return res.json();
+  },
+  deleteKnowledgeDoc: (tenantId: string, docId: string) =>
+    request(`/admin/tenants/${tenantId}/knowledge/${docId}`, { method: "DELETE" }),
 };

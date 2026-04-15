@@ -9,7 +9,7 @@
   // Leer atributos del script tag
   const scriptTag = document.currentScript;
   const TENANT_ID = scriptTag?.getAttribute("data-tenant") || "";
-  const API_BASE = (scriptTag?.getAttribute("data-api") || "http://localhost:8000/v1").replace(/\/$/, "");
+  const API_BASE = (scriptTag?.getAttribute("data-api") || "https://chat.eaistudio.es/api/v1").replace(/\/$/, "");
 
   if (!TENANT_ID) {
     console.error("[AutoChat] data-tenant es obligatorio");
@@ -25,6 +25,22 @@
   }
   const SESSION_KEY = "autochat_session_" + TENANT_ID;
   let SESSION_ID = localStorage.getItem(SESSION_KEY) || "sess_" + genUUID();
+
+  // Capturar UTM params al cargar (se guardan por si el usuario navega y pierde los query params)
+  const UTM_KEY = "autochat_utm_" + TENANT_ID;
+  function captureUtms() {
+    const params = new URLSearchParams(window.location.search);
+    const utms = {};
+    ["utm_source","utm_medium","utm_campaign","utm_term","utm_content","gclid","fbclid"].forEach(k => {
+      const v = params.get(k);
+      if (v) utms[k] = v;
+    });
+    if (Object.keys(utms).length > 0) {
+      sessionStorage.setItem(UTM_KEY, JSON.stringify(utms));
+    }
+    return JSON.parse(sessionStorage.getItem(UTM_KEY) || "{}");
+  }
+  const UTM_DATA = captureUtms();
   localStorage.setItem(SESSION_KEY, SESSION_ID);
 
   // Estado
@@ -63,6 +79,8 @@
       ctx.vehicle_model = vid.getAttribute("data-vehicle-model") || "";
     }
 
+    if (Object.keys(UTM_DATA).length > 0) ctx.utm = UTM_DATA;
+    ctx.referrer = document.referrer || "";
     return ctx;
   }
 
@@ -172,6 +190,7 @@
       display: flex;
       animation: acSlideIn 0.3s cubic-bezier(.34,1.56,.64,1);
     }
+
     @keyframes acSlideIn {
       from { opacity: 0; transform: scale(0.88) translateY(12px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
@@ -188,18 +207,18 @@
       flex-shrink: 0;
     }
     .ac-header-avatar {
-      width: 44px;
-      height: 44px;
+      width: 62px;
+      height: 62px;
       border-radius: 50%;
       background: rgba(255,255,255,0.15);
-      border: 2px solid rgba(255,255,255,0.3);
+      border: 3px solid rgba(255,255,255,0.9);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 22px;
       flex-shrink: 0;
       overflow: hidden;
-      backdrop-filter: blur(4px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     }
     .ac-header-avatar img {
       width: 100%;
@@ -657,38 +676,109 @@
       .ac-input {
         font-size: 16px;
       }
-      .ac-fab-wrapper { bottom: 18px; right: 18px; }
+      .ac-fab-wrapper { bottom: 80px; right: 18px; }
       .ac-fab-wrapper.open { display: none; }
     }
 
     /* Proactive popup */
+
+    /* Cart */
+    .ac-cart-badge {
+      position: absolute; top: -4px; right: -4px;
+      background: #ef4444; color: white; font-size: 10px; font-weight: 700;
+      min-width: 18px; height: 18px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 4px; line-height: 1;
+    }
+    .ac-cart-btn-header {
+      position: relative; background: none; border: none; cursor: pointer;
+      color: white; opacity: 0.8; transition: opacity 0.2s;
+    }
+    .ac-cart-btn-header:hover { opacity: 1; }
+    .ac-cart-btn-header svg { width: 22px; height: 22px; fill: currentColor; }
+    .ac-cart-panel {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--ac-bg); z-index: 10; display: none;
+      flex-direction: column;
+    }
+    .ac-cart-panel.open { display: flex; }
+    .ac-cart-header {
+      padding: 14px 16px; border-bottom: 1px solid var(--ac-border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-weight: 700; font-size: 15px;
+    }
+    .ac-cart-header button { background: none; border: none; cursor: pointer; color: var(--ac-text-secondary); font-size: 20px; }
+    .ac-cart-items {
+      flex: 1; overflow-y: auto; padding: 12px;
+    }
+    .ac-cart-item {
+      display: flex; gap: 10px; padding: 10px; margin-bottom: 8px;
+      background: var(--ac-bg-secondary); border-radius: 10px; align-items: center;
+    }
+    .ac-cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+    .ac-cart-item-info { flex: 1; min-width: 0; }
+    .ac-cart-item-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ac-cart-item-price { font-size: 12px; color: var(--ac-primary); font-weight: 700; }
+    .ac-cart-item-qty {
+      display: flex; align-items: center; gap: 6px; font-size: 13px;
+    }
+    .ac-cart-item-qty button {
+      width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--ac-border);
+      background: var(--ac-bg); cursor: pointer; font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; color: var(--ac-text);
+    }
+    .ac-cart-footer {
+      padding: 14px 16px; border-top: 1px solid var(--ac-border);
+    }
+    .ac-cart-total {
+      display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; margin-bottom: 10px;
+    }
+    .ac-cart-checkout {
+      width: 100%; padding: 12px; background: var(--ac-primary); color: white;
+      border: none; border-radius: 10px; font-weight: 700; font-size: 14px;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .ac-cart-checkout:hover { opacity: 0.9; }
+    .ac-cart-empty { text-align: center; padding: 40px 20px; color: var(--ac-text-secondary); font-size: 13px; }
+    .ac-card-btn.cart-btn {
+      background: var(--ac-accent, #10b981); color: white; border: none;
+      font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .ac-card-btn.cart-btn:hover { opacity: 0.85; }
+
     .ac-proactive {
       position: absolute;
       bottom: 70px;
       right: 0;
-      width: 260px;
+      width: 270px;
       background: #fff;
-      border-radius: 16px;
+      border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      padding: 20px 16px 16px;
+      padding: 44px 18px 18px;
       display: none;
       flex-direction: column;
       align-items: center;
       gap: 10px;
       animation: ac-pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
       z-index: 9999;
+      overflow: visible;
     }
     .ac-proactive-avatar {
-      width: 56px;
-      height: 56px;
+      width: 68px;
+      height: 68px;
       border-radius: 50%;
       overflow: hidden;
-      border: 3px solid var(--ac-primary);
+      border: 3px solid #fff;
       background: var(--ac-primary);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      position: absolute;
+      top: -34px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
     .ac-proactive-avatar img {
       width: 100%;
@@ -939,7 +1029,8 @@
             </div>
             <div class="ac-card-actions">
               <button class="ac-card-btn primary ac-interest-btn" data-id="${v.id}" data-name="${v.brand} ${v.model}">Me interesa</button>
-              <a class="ac-card-btn secondary" href="${v.detail_url}" target="_blank">Ver todos</a>
+              ${widgetConfig.enable_cart ? `<button class="ac-card-btn cart-btn" data-cart-id="${v.id}" data-cart-name="${(v.title||v.brand+' '+v.model).replace(/"/g,'')}" data-cart-price="${v.price}" data-cart-pricefmt="${v.price_formatted}" data-cart-img="${v.image_url||''}">A\u00f1adir</button>` : ""}
+              <a class="ac-card-btn secondary" href="${v.detail_url}" target="_blank">Ver ficha</a>
             </div>
           </div>
         </div>
@@ -995,6 +1086,29 @@
         sendMessage();
       });
     });
+
+    // Botones "A\u00f1adir al carrito"
+    carousel.querySelectorAll(".cart-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const product = {
+          id: btn.dataset.cartId,
+          name: btn.dataset.cartName,
+          price: parseFloat(btn.dataset.cartPrice) || 0,
+          price_fmt: btn.dataset.cartPricefmt,
+          image: btn.dataset.cartImg
+        };
+        addToCart(product);
+        btn.textContent = "\u2713 A\u00f1adido";
+        btn.style.background = "#059669";
+        btn.style.color = "white";
+        setTimeout(() => {
+          btn.textContent = "A\u00f1adir";
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 1500);
+      });
+    });
   }
 
   function addLeadBanner(message) {
@@ -1024,9 +1138,167 @@
     // Avatar en header
     if (config.avatar_url) {
       const headerAvEl = shadow.querySelector(".ac-header-avatar");
-      headerAvEl.innerHTML = `<img src="${config.avatar_url}" alt="bot" />`;
+      headerAvEl.textContent = "";
+      const img = document.createElement("img");
+      img.src = config.avatar_url;
+      img.alt = "bot";
+      headerAvEl.appendChild(img);
+    }
+    // Cart: add cart button to header if enabled
+    if (config.enable_cart) {
+      const headerEl = shadow.querySelector(".ac-header");
+      if (headerEl && !shadow.getElementById("ac-cart-btn-header")) {
+        const cartBtn = document.createElement("button");
+        cartBtn.className = "ac-cart-btn-header";
+        cartBtn.id = "ac-cart-btn-header";
+        cartBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg><span class="ac-cart-badge" id="ac-cart-badge" style="display:none">0</span>';
+        cartBtn.style.marginLeft = "auto";
+        headerEl.appendChild(cartBtn);
+        cartBtn.addEventListener("click", (e) => { e.stopPropagation(); openCart(); });
+
+        // Add cart panel to window
+        const win = shadow.querySelector(".ac-window");
+        if (win && !shadow.getElementById("ac-cart-panel")) {
+          const panel = document.createElement("div");
+          panel.className = "ac-cart-panel";
+          panel.id = "ac-cart-panel";
+          panel.innerHTML = `
+            <div class="ac-cart-header"><span>Carrito</span><button id="ac-cart-close">\u2715</button></div>
+            <div class="ac-cart-items" id="ac-cart-items"></div>
+            <div class="ac-cart-footer">
+              <div class="ac-cart-total"><span>Total</span><span id="ac-cart-total">0 \u20ac</span></div>
+              <button class="ac-cart-checkout" id="ac-cart-checkout">Hacer pedido</button>
+            </div>
+          `;
+          win.appendChild(panel);
+          panel.querySelector("#ac-cart-close").addEventListener("click", closeCart);
+          panel.querySelector("#ac-cart-checkout").addEventListener("click", () => {
+            if (acCart.length === 0) return;
+            const checkoutUrl = widgetConfig.checkout_url || "";
+            if (checkoutUrl) {
+              // External checkout: open store with first product, then redirect to checkout
+              const addPattern = widgetConfig.checkout_add_pattern || "";
+              if (addPattern && acCart.length > 0) {
+                // Open new tab adding first product
+                const firstUrl = addPattern.replace("{id}", acCart[0].id).replace("{qty}", acCart[0].qty);
+                const newTab = window.open(firstUrl, "_blank");
+                // Add remaining products and finish at checkout
+                if (newTab && acCart.length > 1) {
+                  let idx = 1;
+                  const addNext = () => {
+                    if (idx < acCart.length) {
+                      const url = addPattern.replace("{id}", acCart[idx].id).replace("{qty}", acCart[idx].qty);
+                      try { newTab.location.href = url; } catch(e) {}
+                      idx++;
+                      setTimeout(addNext, 1200);
+                    } else {
+                      setTimeout(() => { try { newTab.location.href = checkoutUrl; } catch(e) {} }, 1200);
+                    }
+                  };
+                  setTimeout(addNext, 1500);
+                } else if (newTab) {
+                  setTimeout(() => { try { newTab.location.href = checkoutUrl; } catch(e) {} }, 1500);
+                }
+              } else {
+                window.open(checkoutUrl, "_blank");
+              }
+              // Clear cart
+              acCart = [];
+              saveCart();
+              closeCart();
+              renderCartPanel();
+            } else {
+              // No external checkout: send as chat message
+              const items = acCart.map(i => i.name + " x" + i.qty + " (" + i.price_fmt + ")").join(", ");
+              closeCart();
+              input.value = "Quiero hacer un pedido: " + items;
+              sendMessage();
+            }
+          });
+          updateCartBadge();
+        }
+      }
+    }
+
+    // Posición: bottom-left o bottom-right
+    if (config.position === "bottom-left") {
+      const fab = shadow.querySelector(".ac-fab-wrapper");
+      const win = shadow.querySelector(".ac-window");
+      const pro = shadow.getElementById("ac-proactive");
+      fab.style.right = "auto"; fab.style.left = "24px";
+      win.style.right = "auto"; win.style.left = "24px";
+      win.style.transformOrigin = "bottom left";
+      if (pro) { pro.style.right = "auto"; pro.style.left = "90px"; }
     }
   }
+
+
+    // === Cart ===
+    let acCart = JSON.parse(localStorage.getItem("ac_cart_" + TENANT_ID) || "[]");
+
+    function saveCart() { localStorage.setItem("ac_cart_" + TENANT_ID, JSON.stringify(acCart)); updateCartBadge(); }
+    
+    function updateCartBadge() {
+      const badge = shadow.getElementById("ac-cart-badge");
+      const total = acCart.reduce((s, i) => s + i.qty, 0);
+      if (badge) { badge.textContent = total; badge.style.display = total > 0 ? "flex" : "none"; }
+    }
+
+    function addToCart(product) {
+      const existing = acCart.find(i => i.id === product.id);
+      if (existing) { existing.qty++; } else { acCart.push({ ...product, qty: 1 }); }
+      saveCart();
+    }
+
+    function renderCartPanel() {
+      const panel = shadow.getElementById("ac-cart-panel");
+      const items = shadow.getElementById("ac-cart-items");
+      const total = shadow.getElementById("ac-cart-total");
+      if (!items) return;
+      if (acCart.length === 0) {
+        items.innerHTML = '<div class="ac-cart-empty">El carrito est\u00e1 vac\u00edo</div>';
+        total.textContent = "0 \u20ac";
+        return;
+      }
+      items.innerHTML = acCart.map((item, idx) => `
+        <div class="ac-cart-item">
+          <img src="${item.image || ""}" alt="" onerror="this.style.display='none'" />
+          <div class="ac-cart-item-info">
+            <div class="ac-cart-item-name">${item.name}</div>
+            <div class="ac-cart-item-price">${item.price_fmt}</div>
+          </div>
+          <div class="ac-cart-item-qty">
+            <button data-cart-minus="${idx}">\u2212</button>
+            <span>${item.qty}</span>
+            <button data-cart-plus="${idx}">+</button>
+          </div>
+        </div>
+      `).join("");
+      items.querySelectorAll("[data-cart-minus]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = parseInt(btn.dataset.cartMinus);
+          acCart[i].qty--; if (acCart[i].qty <= 0) acCart.splice(i, 1);
+          saveCart(); renderCartPanel();
+        });
+      });
+      items.querySelectorAll("[data-cart-plus]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = parseInt(btn.dataset.cartPlus);
+          acCart[i].qty++; saveCart(); renderCartPanel();
+        });
+      });
+      const sum = acCart.reduce((s, i) => s + (i.price * i.qty), 0);
+      total.textContent = sum.toFixed(2).replace(".", ",") + " \u20ac";
+    }
+
+    function openCart() {
+      const panel = shadow.getElementById("ac-cart-panel");
+      if (panel) { panel.classList.add("open"); renderCartPanel(); }
+    }
+    function closeCart() {
+      const panel = shadow.getElementById("ac-cart-panel");
+      if (panel) panel.classList.remove("open");
+    }
 
   // === API ===
   async function initSession() {
@@ -1055,13 +1327,13 @@
         const welcome = widgetConfig.welcome_message || "¡Hola! 👋 ¿En qué puedo ayudarte hoy?";
         addMessage("bot", welcome);
         // Quick replies de bienvenida
-        const quickReplies = widgetConfig.quick_replies || ["Buscar coche", "Ver financiación", "Contactar"];
+        const quickReplies = widgetConfig.quick_replies || ["Información", "Contactar"];
         addQuickReplies(quickReplies);
       }
     } catch (err) {
       console.error("[AutoChat] Error inicializando:", err);
       addMessage("bot", "¡Hola! 👋 ¿En qué puedo ayudarte hoy?");
-      addQuickReplies(["Buscar coche", "Ver financiación", "Contactar"]);
+      addQuickReplies(["Información", "Contactar"]);
     }
   }
 
@@ -1196,7 +1468,7 @@
   }
 
   // === Proactive popup ===
-  const PROACTIVE_KEY = "autochat_proactive_shown_" + TENANT_ID;
+  const PROACTIVE_KEY = "autochat_proactive_shown_" + TENANT_ID + "_" + window.location.pathname;
 
   function buildProactivePopup() {
     const ctx = detectPageContext();
@@ -1204,13 +1476,20 @@
     const msgEl = shadow.getElementById("ac-proactive-msg");
     const avatarEl = shadow.getElementById("ac-proactive-avatar");
     if (widgetConfig.avatar_url) {
-      avatarEl.innerHTML = `<img src="${widgetConfig.avatar_url}" alt="bot" />`;
+      avatarEl.textContent = "";
+      const img = document.createElement("img");
+      img.src = widgetConfig.avatar_url;
+      img.alt = "bot";
+      avatarEl.appendChild(img);
     }
 
     let message = "";
     let buttons = [];
 
-    if (ctx.page_type === "vehicle_detail" && ctx.vehicle_brand && ctx.vehicle_model) {
+    if (widgetConfig.proactive_message) {
+      message = widgetConfig.proactive_message;
+      buttons = (widgetConfig.proactive_buttons || []).map(b => ({ label: b.label, msg: b.msg }));
+    } else if (ctx.page_type === "vehicle_detail" && ctx.vehicle_brand && ctx.vehicle_model) {
       const brand = ctx.vehicle_brand.replace(/-/g, " ").toUpperCase();
       const model = ctx.vehicle_model.replace(/-/g, " ").toUpperCase();
       message = `¿Quieres saber más cosas de este ${brand} ${model}?`;
@@ -1253,7 +1532,27 @@
     sessionStorage.setItem(PROACTIVE_KEY, "1");
   }
 
-  setTimeout(showProactive, 6000);
+  // Prefetch widget config para el proactive popup
+  async function prefetchConfig() {
+    try {
+      const res = await fetch(`${API_BASE}/chat/init`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Tenant-ID": TENANT_ID },
+        body: JSON.stringify({ session_id: SESSION_ID, page_context: detectPageContext() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.widget_config) applyConfig(data.widget_config);
+      }
+    } catch (e) { /* silently fail */ }
+  }
+
+  // Prefetch config y mostrar proactive tras 6s (lo que tarde más)
+  const prefetchPromise = prefetchConfig();
+  setTimeout(async () => {
+    await prefetchPromise;
+    showProactive();
+  }, 6000);
 
   shadow.getElementById("ac-proactive-close").addEventListener("click", (e) => {
     e.stopPropagation();

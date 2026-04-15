@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bodega Alma | Enoteca Premium en Madrid</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        wine: { 50:'#fdf2f2', 100:'#fce4e4', 200:'#f9cfcf', 300:'#f2a8a8', 400:'#e87171', 500:'#d94545', 600:'#b91c1c', 700:'#7c2d12', 800:'#5c1a0b', 900:'#3b0f07', 950:'#1a0503' },
+        gold: { 50:'#fefce8', 100:'#fef9c3', 200:'#fef08a', 300:'#fde047', 400:'#d4a017', 500:'#a16207', 600:'#854d0e', 700:'#713f12' },
+        cream: '#faf7f2',
+      },
+      fontFamily: {
+        display: ['Playfair Display', 'serif'],
+        body: ['Inter', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300; }
+  .bg-wine-gradient { background: linear-gradient(135deg, #1a0503 0%, #3b0f07 30%, #5c1a0b 60%, #7c2d12 100%); }
+  .text-balance { text-wrap: balance; }
+  .wine-card:hover .wine-label { transform: translateY(-4px); }
+</style>
+</head>
+<body class="bg-cream text-stone-800 font-body">
+
+<!-- Demo Banner -->
+<div class="bg-wine-700 text-white/90 text-center py-2 text-xs font-medium tracking-wide">
+  Demo interactiva de <a href="https://chat.eaistudio.es" class="underline font-semibold">AutoChat AI</a> &mdash; Asistente IA para enotecas y bodegas
+</div>
+
+<!-- Nav -->
+<nav class="sticky top-0 z-50 bg-cream/80 backdrop-blur-xl border-b border-stone-200/50">
+<div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+  <a href="#" class="font-display text-2xl font-bold tracking-tight text-wine-800">Bodega <span class="italic text-gold-500">Alma</span></a>
+  <div class="hidden md:flex items-center gap-10 text-sm font-medium text-stone-500">
+    <a href="#coleccion" class="hover:text-wine-700 transition-colors">Colecci&oacute;n</a>
+    <a href="#catas" class="hover:text-wine-700 transition-colors">Catas</a>
+    <a href="#club" class="hover:text-wine-700 transition-colors">Club de Vino</a>
+    <a href="#contacto" class="hover:text-wine-700 transition-colors">Contacto</a>
+  </div>
+  <a href="tel:+34914321890" class="hidden md:flex items-center gap-2 text-sm text-wine-700 font-semibold">
+    <span class="material-symbols-outlined text-lg">call</span>
+    91 432 18 90
+  </a>
+</div>
+</nav>
+
+<!-- Hero -->
+<section class="bg-wine-gradient text-white relative overflow-hidden">
+<div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><circle cx=%2230%22 cy=%2230%22 r=%221%22 fill=%22white%22/></svg>');"></div>
+<div class="max-w-6xl mx-auto px-6 py-24 md:py-36 relative z-10">
+  <div class="max-w-2xl">
+    <p class="text-gold-400 text-sm font-semibold tracking-[0.25em] uppercase mb-6">Enoteca Premium &middot; Madrid</p>
+    <h1 class="font-display text-5xl md:text-7xl font-bold leading-[1.1] mb-6 text-balance">
+      Donde cada copa cuenta una <span class="italic text-gold-300">historia</span>
+    </h1>
+    <p class="text-lg text-white/70 leading-relaxed max-w-lg mb-10">
+      M&aacute;s de 400 referencias seleccionadas por nuestros sumilleres. Catas privadas, maridajes exclusivos y el arte de vivir bien.
+    </p>
+    <div class="flex flex-wrap gap-4">
+      <a href="#coleccion" class="px-8 py-4 bg-gold-500 text-wine-950 font-semibold rounded-lg hover:bg-gold-400 transition-colors">
+        Explorar colecci&oacute;n
+      </a>
+      <a href="#catas" class="px-8 py-4 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/5 transition-colors">
+        Reservar cata
+      </a>
+    </div>
+  </div>
+</div>
+<div class="absolute right-0 top-0 w-1/3 h-full opacity-20 bg-gradient-to-l from-gold-500/20 to-transparent"></div>
+</section>
+
+<!-- Stats -->
+<div class="border-b border-stone-200/50">
+<div class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+  <div>
+    <p class="font-display text-3xl font-bold text-wine-700">+400</p>
+    <p class="text-sm text-stone-500 mt-1">Referencias</p>
+  </div>
+  <div>
+    <p class="font-display text-3xl font-bold text-wine-700">12</p>
+    <p class="text-sm text-stone-500 mt-1">Pa&iacute;ses de origen</p>
+  </div>
+  <div>
+    <p class="font-display text-3xl font-bold text-wine-700">+2.000</p>
+    <p class="text-sm text-stone-500 mt-1">Catas realizadas</p>
+  </div>
+  <div>
+    <p class="font-display text-3xl font-bold text-wine-700">98</p>
+    <p class="text-sm text-stone-500 mt-1">Puntuaci&oacute;n m&aacute;xima</p>
+  </div>
+</div>
+</div>
+
+<!-- Colecci&oacute;n -->
+<section class="py-20 md:py-28" id="coleccion">
+<div class="max-w-6xl mx-auto px-6">
+  <div class="text-center mb-16">
+    <p class="text-gold-500 text-sm font-semibold tracking-[0.2em] uppercase mb-3">Nuestra Selecci&oacute;n</p>
+    <h2 class="font-display text-3xl md:text-5xl font-bold">Vinos con <span class="italic">alma</span></h2>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-8">
+    <!-- Tinto -->
+    <div class="wine-card group">
+      <div class="aspect-[3/4] bg-gradient-to-b from-wine-800 to-wine-950 rounded-2xl overflow-hidden relative mb-5">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="font-display text-[120px] font-bold text-white/5">T</span>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
+          <p class="font-display text-2xl font-bold text-white">Tintos</p>
+          <p class="text-white/60 text-sm mt-1">Ribera, Rioja, Priorat, Toro...</p>
+        </div>
+      </div>
+      <div class="wine-label transition-transform">
+        <p class="font-display text-lg font-semibold">Vega Sicilia &Uacute;nico 2014</p>
+        <p class="text-sm text-stone-500">Ribera del Duero &middot; 98 pts Parker</p>
+        <p class="text-wine-700 font-bold mt-2">289 &euro;</p>
+      </div>
+    </div>
+
+    <!-- Blanco -->
+    <div class="wine-card group">
+      <div class="aspect-[3/4] bg-gradient-to-b from-gold-100 to-gold-300 rounded-2xl overflow-hidden relative mb-5">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="font-display text-[120px] font-bold text-white/20">B</span>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/40 to-transparent">
+          <p class="font-display text-2xl font-bold text-white">Blancos</p>
+          <p class="text-white/70 text-sm mt-1">Albari&ntilde;o, Verdejo, Godello...</p>
+        </div>
+      </div>
+      <div class="wine-label transition-transform">
+        <p class="font-display text-lg font-semibold">Belondrade y Lurton 2020</p>
+        <p class="text-sm text-stone-500">Rueda &middot; Verdejo fermentado en barrica</p>
+        <p class="text-wine-700 font-bold mt-2">32 &euro;</p>
+      </div>
+    </div>
+
+    <!-- Espumoso -->
+    <div class="wine-card group">
+      <div class="aspect-[3/4] bg-gradient-to-b from-stone-200 to-stone-400 rounded-2xl overflow-hidden relative mb-5">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="font-display text-[120px] font-bold text-white/15">E</span>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/40 to-transparent">
+          <p class="font-display text-2xl font-bold text-white">Espumosos</p>
+          <p class="text-white/70 text-sm mt-1">Champagne, Cava Gran Reserva...</p>
+        </div>
+      </div>
+      <div class="wine-label transition-transform">
+        <p class="font-display text-lg font-semibold">Dom P&eacute;rignon 2013</p>
+        <p class="text-sm text-stone-500">Champagne &middot; Vintage</p>
+        <p class="text-wine-700 font-bold mt-2">220 &euro;</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Catas -->
+<section class="py-20 md:py-28 bg-wine-gradient text-white" id="catas">
+<div class="max-w-6xl mx-auto px-6">
+  <div class="text-center mb-16">
+    <p class="text-gold-400 text-sm font-semibold tracking-[0.2em] uppercase mb-3">Experiencias</p>
+    <h2 class="font-display text-3xl md:text-5xl font-bold">Catas <span class="italic text-gold-300">privadas</span></h2>
+    <p class="text-white/60 mt-4 max-w-xl mx-auto">Deja que nuestros sumilleres te gu&iacute;en en un viaje sensorial por las mejores denominaciones de origen.</p>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-colors">
+      <div class="w-12 h-12 bg-gold-500/20 rounded-xl flex items-center justify-center mb-5">
+        <span class="material-symbols-outlined text-gold-400">wine_bar</span>
+      </div>
+      <h3 class="font-display text-xl font-bold mb-2">Riberas &amp; Riojas</h3>
+      <p class="text-white/50 text-sm leading-relaxed mb-4">5 vinos de las dos grandes DO. Tempranillo en estado puro.</p>
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-2xl font-bold text-gold-400">45 &euro;</p>
+          <p class="text-xs text-white/40">/persona &middot; m&iacute;n. 4</p>
+        </div>
+        <span class="text-xs text-white/30">2h aprox.</span>
+      </div>
+    </div>
+
+    <div class="bg-white/5 backdrop-blur border border-gold-400/30 rounded-2xl p-8 relative hover:bg-white/10 transition-colors">
+      <div class="absolute -top-3 right-6 bg-gold-500 text-wine-950 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">Popular</div>
+      <div class="w-12 h-12 bg-gold-500/20 rounded-xl flex items-center justify-center mb-5">
+        <span class="material-symbols-outlined text-gold-400">visibility_off</span>
+      </div>
+      <h3 class="font-display text-xl font-bold mb-2">Cata a Ciegas</h3>
+      <p class="text-white/50 text-sm leading-relaxed mb-4">6 vinos sin etiqueta. Pon a prueba tu paladar y sorpr&eacute;ndete.</p>
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-2xl font-bold text-gold-400">60 &euro;</p>
+          <p class="text-xs text-white/40">/persona &middot; m&iacute;n. 4</p>
+        </div>
+        <span class="text-xs text-white/30">2.5h aprox.</span>
+      </div>
+    </div>
+
+    <div class="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-colors">
+      <div class="w-12 h-12 bg-gold-500/20 rounded-xl flex items-center justify-center mb-5">
+        <span class="material-symbols-outlined text-gold-400">groups</span>
+      </div>
+      <h3 class="font-display text-xl font-bold mb-2">Evento Corporativo</h3>
+      <p class="text-white/50 text-sm leading-relaxed mb-4">Sal&oacute;n privado, selecci&oacute;n a medida y servicio de catering.</p>
+      <div class="flex items-end justify-between">
+        <div>
+          <p class="text-2xl font-bold text-gold-400">A medida</p>
+          <p class="text-xs text-white/40">hasta 20 personas</p>
+        </div>
+        <span class="text-xs text-white/30">3h aprox.</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Club -->
+<section class="py-20 md:py-28" id="club">
+<div class="max-w-4xl mx-auto px-6 text-center">
+  <p class="text-gold-500 text-sm font-semibold tracking-[0.2em] uppercase mb-3">Exclusivo</p>
+  <h2 class="font-display text-3xl md:text-5xl font-bold mb-6">Club de Vino <span class="italic">Alma</span></h2>
+  <p class="text-stone-500 max-w-xl mx-auto mb-12">Cada mes, 3 botellas seleccionadas por nuestro sumiller con fichas de cata, maridajes sugeridos y acceso a eventos exclusivos.</p>
+
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm">
+      <p class="text-gold-500 text-sm font-semibold uppercase tracking-wider mb-2">Descubrimiento</p>
+      <p class="font-display text-4xl font-bold text-wine-800">39 <span class="text-lg">&euro;/mes</span></p>
+      <ul class="mt-6 space-y-3 text-sm text-stone-600 text-left">
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-500 text-base">check_circle</span> 3 botellas seleccionadas</li>
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-500 text-base">check_circle</span> Fichas de cata</li>
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-500 text-base">check_circle</span> Env&iacute;o gratuito</li>
+      </ul>
+    </div>
+    <div class="bg-wine-800 text-white rounded-2xl p-8 border border-wine-700 shadow-xl md:scale-105 relative">
+      <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold-500 text-wine-950 text-[10px] font-bold uppercase tracking-wider px-4 py-1 rounded-full">Recomendado</div>
+      <p class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Premium</p>
+      <p class="font-display text-4xl font-bold">69 <span class="text-lg">&euro;/mes</span></p>
+      <ul class="mt-6 space-y-3 text-sm text-white/70 text-left">
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-400 text-base">check_circle</span> 3 botellas premium</li>
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-400 text-base">check_circle</span> 1 cata gratis al trimestre</li>
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-400 text-base">check_circle</span> 10% dto. en tienda</li>
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-400 text-base">check_circle</span> Acceso eventos VIP</li>
+      </ul>
+    </div>
+    <div class="bg-white rounded-2xl p-8 border border-stone-200 shadow-sm">
+      <p class="text-gold-500 text-sm font-semibold uppercase tracking-wider mb-2">Coleccionista</p>
+      <p class="font-display text-4xl font-bold text-wine-800">129 <span class="text-lg">&euro;/mes</span></p>
+      <ul class="mt-6 space-y-3 text-sm text-stone-600 text-left">
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-500 text-base">check_circle</span> 3 vinos de alta gama</li>
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-500 text-base">check_circle</span> Cata mensual incluida</li>
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-500 text-base">check_circle</span> Sumiller personal</li>
+        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-500 text-base">check_circle</span> Ediciones limitadas</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Contacto -->
+<section class="py-20 md:py-28 bg-stone-100" id="contacto">
+<div class="max-w-4xl mx-auto px-6">
+  <div class="text-center mb-12">
+    <p class="text-gold-500 text-sm font-semibold tracking-[0.2em] uppercase mb-3">Vis&iacute;tanos</p>
+    <h2 class="font-display text-3xl md:text-4xl font-bold">Barrio de Salamanca, Madrid</h2>
+  </div>
+  <div class="grid md:grid-cols-3 gap-8 text-center">
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-14 h-14 bg-wine-700/10 rounded-2xl flex items-center justify-center">
+        <span class="material-symbols-outlined text-wine-700">location_on</span>
+      </div>
+      <p class="font-semibold">Calle Serrano 42</p>
+      <p class="text-sm text-stone-500">28001 Madrid</p>
+    </div>
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-14 h-14 bg-wine-700/10 rounded-2xl flex items-center justify-center">
+        <span class="material-symbols-outlined text-wine-700">schedule</span>
+      </div>
+      <p class="font-semibold">Mar - S&aacute;b 11-21h</p>
+      <p class="text-sm text-stone-500">Dom 11-15h &middot; Lun cerrado</p>
+    </div>
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-14 h-14 bg-wine-700/10 rounded-2xl flex items-center justify-center">
+        <span class="material-symbols-outlined text-wine-700">call</span>
+      </div>
+      <p class="font-semibold">91 432 18 90</p>
+      <p class="text-sm text-stone-500">info@bodegaalma.es</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-wine-950 text-white/40 text-center py-8 text-xs">
+  <p class="font-display text-lg text-white/80 mb-2">Bodega <span class="italic text-gold-400">Alma</span></p>
+  <p>&copy; 2026 &mdash; Enoteca ficticia creada para demostrar <a href="https://chat.eaistudio.es" class="text-gold-400 hover:underline">AutoChat AI</a></p>
+</footer>
+
+<!-- AutoChat AI Widget -->
+<script src="https://chat.eaistudio.es/widget.js" data-tenant="32abd31f-6349-4a41-939d-587aa84b3db9"></script>
+
+</body>
+</html>

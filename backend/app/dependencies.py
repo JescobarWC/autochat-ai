@@ -70,14 +70,22 @@ async def validate_origin(request: Request, tenant: dict = Depends(get_tenant)):
     origin = request.headers.get("origin", "")
     allowed = tenant.get("allowed_domains", [])
 
-    if not origin or not allowed:
+    # Si no hay origin (requests server-side, curl, etc.) permitir
+    if not origin:
         return tenant
 
-    from urllib.parse import urlparse
-    hostname = urlparse(origin).hostname or ""
+    # Si el tenant no tiene allowed_domains configurados, rechazar por seguridad
+    if not allowed:
+        logger.warning(f"Tenant {tenant['slug']} sin allowed_domains configurados, rechazando origin {origin}")
+        raise HTTPException(status_code=403, detail="Origen no autorizado")
 
+    from urllib.parse import urlparse
+    parsed = urlparse(origin)
+    hostname = parsed.hostname or ""
+
+    # Validación exacta de hostname (no substring)
     if hostname not in allowed:
-        logger.warning(f"Origin no permitido: {hostname} (tenant: {tenant['slug']})")
+        logger.warning(f"Origin no permitido: {hostname} (tenant: {tenant['slug']}, allowed: {allowed})")
         raise HTTPException(status_code=403, detail="Origen no autorizado")
 
     return tenant

@@ -4,7 +4,7 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
 from app.dependencies import get_chat_service
@@ -25,7 +25,7 @@ class PageContext(BaseModel):
 
 class ChatRequest(BaseModel):
     session_id: Optional[str] = None
-    message: str
+    message: str = Field(..., max_length=2000)
     page_context: Optional[PageContext] = None
 
 

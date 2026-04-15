@@ -7,12 +7,12 @@ from functools import lru_cache
 class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str = ""
-    openai_model: str = "gpt-4.1"
+    openai_model: str = "gpt-4.1-mini"
 
     # JWT
     jwt_secret: str = "cambiar-en-produccion"
     jwt_algorithm: str = "HS256"
-    jwt_expire_minutes: int = 480
+    jwt_expire_minutes: int = 120
 
     # Base de datos
     database_url: str = "postgresql+asyncpg://autochat:autochat_dev@localhost:5432/autochat"
@@ -27,6 +27,14 @@ class Settings(BaseSettings):
 
     # CORS
     cors_extra_origins: str = "http://localhost:8080,http://localhost:3000"
+
+    # Email / SMTP
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = "notificaciones@eaistudio.es"
+    smtp_from_name: str = "AutoChat AI"
 
     # Chat
     max_tool_iterations: int = 5

@@ -75,14 +75,31 @@ def _build_page_context(page_context: dict | None) -> str:
     return ""
 
 
-def build_system_prompt(tenant_config: dict, page_context: dict | None = None) -> str:
-    """Construye el system prompt con la config del tenant y el contexto de página."""
+KNOWLEDGE_SECTION = """
+## Base de conocimiento interna
+La siguiente información proviene de los documentos internos de la empresa. Usa esta información para responder preguntas del usuario cuando sea relevante.
+
+{knowledge_context}
+
+IMPORTANTE: Si la información de los documentos no cubre la pregunta del usuario, dilo honestamente. No inventes información que no esté en los documentos."""
+
+
+def build_system_prompt(
+    tenant_config: dict,
+    page_context: dict | None = None,
+    knowledge_context: str | None = None,
+) -> str:
+    """Construye el system prompt con la config del tenant, contexto de página y base de conocimiento."""
     page_instructions = _build_page_context(page_context)
+    knowledge_section = KNOWLEDGE_SECTION.format(knowledge_context=knowledge_context) if knowledge_context else ""
 
     # Si hay custom_system_prompt, úsalo en vez del template base
     custom = (tenant_config.get("custom_system_prompt") or "").strip()
     if custom:
-        parts = [custom, TOOLS_SECTION]
+        parts = [custom]
+        if knowledge_section:
+            parts.append(knowledge_section)
+        parts.append(TOOLS_SECTION)
         if page_instructions:
             parts.append("\n" + page_instructions)
         prompt = "\n".join(parts)
@@ -91,7 +108,6 @@ def build_system_prompt(tenant_config: dict, page_context: dict | None = None) -
 
     # Template por defecto
     company = tenant_config.get("company_info", {})
-    # Leer personality desde config.personality (directo) o config.overrides.personality (legacy)
     overrides = tenant_config.get("overrides", {})
     personality = (
         tenant_config.get("personality")
@@ -112,6 +128,8 @@ def build_system_prompt(tenant_config: dict, page_context: dict | None = None) -
         warranty_policy=warranty,
         delivery_info=delivery,
     )
+    if knowledge_section:
+        prompt += "\n" + knowledge_section
     prompt += TOOLS_SECTION
     if page_instructions:
         prompt += "\n\n" + page_instructions

@@ -196,19 +196,58 @@ class InventoryAdapter:
             logger.error("xml_feed configurado pero sin feed_url")
             return []
 
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                resp = await client.get(feed_url)
-                resp.raise_for_status()
-                xml_text = resp.text
-        except Exception as e:
-            logger.error(f"Error descargando feed XML: {e}")
-            return []
+        xml_text = ""
+        # If URL points to local uploads, read from disk directly
+        if "/uploads/feeds/" in feed_url:
+            import os
+            filename = feed_url.split("/uploads/feeds/")[-1].split("?")[0]
+            local_path = f"/app/uploads/feeds/{filename}"
+            if os.path.exists(local_path):
+                with open(local_path, "r", encoding="utf-8") as f:
+                    xml_text = f.read()
+                logger.info(f"Feed XML le\u00eddo desde disco: {local_path} ({len(xml_text)} chars)")
+
+        if not xml_text:
+            try:
+                async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
+                    resp = await client.get(feed_url)
+                    resp.raise_for_status()
+                    xml_text = resp.text
+            except Exception as e:
+                logger.error(f"Error descargando feed XML: {e}")
+                return []
 
         try:
             parsed = xmltodict.parse(xml_text)
-            ads_root = parsed.get("standard", parsed)
-            ads = ads_root.get("ad", [])
+
+            # Detectar estructura del XML autom\u00e1ticamente
+            ads = []
+            if "standard" in parsed:
+                # Feed estándar de coches (inventario.pro, coches.net)
+                ads_root = parsed["standard"]
+                ads = ads_root.get("ad", [])
+            elif "catalogo" in parsed:
+                # Catálogo en español (bodegas, enotecas, etc.)
+                products = parsed["catalogo"].get("producto", [])
+                ads = products if isinstance(products, list) else [products]
+            elif "catalog" in parsed:
+                # Catálogo genérico (ecommerce, bodegas, etc.)
+                products = parsed["catalog"].get("products", {})
+                ads = products.get("product", [])
+            else:
+                # Intentar encontrar el array de items
+                for key in parsed:
+                    root = parsed[key]
+                    if isinstance(root, dict):
+                        for subkey in root:
+                            if isinstance(root[subkey], (list, dict)):
+                                ads = root[subkey] if isinstance(root[subkey], list) else [root[subkey]]
+                                break
+                    elif isinstance(root, list):
+                        ads = root
+                    if ads:
+                        break
+
             if isinstance(ads, dict):
                 ads = [ads]
         except Exception as e:
@@ -220,8 +259,9 @@ class InventoryAdapter:
             "/comprar-coches-ocasion/{make}/{model}/{id}"
         )
 
-        vehicles = [parse_ad(ad, detail_pattern) for ad in ads]
-        logger.info(f"Feed XML parseado: {len(vehicles)} vehiculos")
+        vehicles = [self._parse_generic_item(ad, detail_pattern) for ad in ads]
+        vehicles = [v for v in vehicles if v.get("id")]  # Filtrar items inv\u00e1lidos
+        logger.info(f"Feed XML parseado: {len(vehicles)} items")
 
         if self.redis and vehicles:
             await self.redis.setex(
@@ -230,6 +270,184 @@ class InventoryAdapter:
             )
 
         return vehicles
+
+    def _parse_generic_item(self, item: dict, detail_pattern: str) -> dict:
+        """Parsea un item gen\u00e9rico de XML (coches, vinos, productos)."""
+        # Intentar extraer campos comunes de cualquier estructura
+        # Handle nested structures (info_basica, comercial, media, etc.)
+        info = item.get("info_basica", {}) or {}
+        if not isinstance(info, dict): info = {}
+        comercial = item.get("comercial", {}) or {}
+        if not isinstance(comercial, dict): comercial = {}
+        media = item.get("media", {}) or {}
+        if not isinstance(media, dict): media = {}
+        caract = item.get("caracteristicas", {}) or {}
+        if not isinstance(caract, dict): caract = {}
+        nota_cata = item.get("nota_de_cata", {}) or {}
+        if not isinstance(nota_cata, dict): nota_cata = {}
+
+        item_id = str(item.get("@id", "") or item.get("id", "") or item.get("sku", "") or comercial.get("ean13", ""))
+        name = str(info.get("nombre", "") or item.get("name", "") or item.get("title", "") or item.get("nombre", ""))
+        url = str(media.get("url", "") or item.get("url", "") or item.get("link", "") or "")
+
+        # Precio: puede estar en pricing.price, price, precio
+        price = 0
+        pricing = item.get("pricing", {})
+        if isinstance(pricing, dict):
+            price = safe_float(pricing.get("price", 0))
+        if not price:
+            price = safe_float(comercial.get("precio_pvpr", 0) or item.get("price", 0) or item.get("precio", 0))
+
+        # Descripci\u00f3n
+        descs = item.get("descriptions", {})
+        description = ""
+        if isinstance(descs, dict):
+            description = str(descs.get("full_description", "") or descs.get("short_description", ""))
+        if not description:
+            description = str(item.get("description", "") or item.get("descripcion", ""))
+
+        # Wine-specific: build rich description from structured data
+        bodega = str(info.get("bodega", "") or item.get("bodega", "") or "")
+        denominacion = str(info.get("denominacion", "") or item.get("denominacion", "") or "")
+        cosecha = str(info.get("cosecha", "") or item.get("cosecha", "") or "")
+        pais = str(info.get("pais", "") or "")
+        alcohol_val = str(caract.get("alcohol", "") or item.get("alcohol", "") or "")
+        volumen_val = str(caract.get("volumen", "") or item.get("volumen", "") or "")
+        maridaje = str(item.get("maridaje", "") or "")
+        elaboracion = str(item.get("elaboracion", "") or "")
+        vinedo = str(item.get("vinedo", "") or "")
+        temp_servicio = str(item.get("temperatura_servicio", "") or "")
+
+        # Uvas
+        uvas_data = caract.get("uvas", {})
+        uvas = []
+        if isinstance(uvas_data, dict):
+            u = uvas_data.get("uva", [])
+            if isinstance(u, list):
+                uvas = [str(x) for x in u if x]
+            elif u:
+                uvas = [str(u)]
+        uvas_str = ", ".join(uvas) if uvas else ""
+
+        # Nota de cata
+        cata_parts = []
+        if nota_cata.get("vista"):
+            cata_parts.append(f"Vista: {nota_cata['vista']}")
+        if nota_cata.get("aroma"):
+            cata_parts.append(f"Aroma: {nota_cata['aroma']}")
+        if nota_cata.get("boca"):
+            cata_parts.append(f"Boca: {nota_cata['boca']}")
+        nota_cata_str = ". ".join(cata_parts)
+
+        # Enrich description
+        wine_info = []
+        if bodega: wine_info.append(f"Bodega: {bodega}")
+        if denominacion: wine_info.append(f"DO: {denominacion}")
+        if cosecha: wine_info.append(f"Cosecha: {cosecha}")
+        if uvas_str: wine_info.append(f"Uvas: {uvas_str}")
+        if alcohol_val: wine_info.append(f"Alcohol: {alcohol_val}%")
+        if volumen_val: wine_info.append(f"Volumen: {volumen_val}")
+        if pais: wine_info.append(f"Pa\u00eds: {pais}")
+        if maridaje: wine_info.append(f"Maridaje: {maridaje}")
+        if nota_cata_str: wine_info.append(f"Nota de cata: {nota_cata_str}")
+        if elaboracion and elaboracion != description: wine_info.append(f"Elaboraci\u00f3n: {elaboracion}")
+        if vinedo and vinedo != description: wine_info.append(f"Vi\u00f1edo: {vinedo}")
+        if temp_servicio: wine_info.append(f"Temperatura: {temp_servicio}")
+
+        if wine_info:
+            description = description + " | " + " | ".join(wine_info) if description else " | ".join(wine_info)
+
+        # Categor\u00eda
+        cats = item.get("categorization", {})
+        category = ""
+        if isinstance(cats, dict):
+            category = str(cats.get("category", "") or cats.get("type", ""))
+        if not category:
+            category = str(info.get("categoria", "") or info.get("tipo_producto", "") or item.get("category", "") or item.get("type", "") or item.get("@tipo", ""))
+        # Enrich category with denomination
+        if denominacion and denominacion not in category:
+            category = f"{category} > {denominacion}" if category else denominacion
+
+        # Imagen
+        image_url = str(media.get("imagen", "") or "")
+        if not image_url:
+            images = item.get("images", {})
+            if isinstance(images, dict):
+                img = images.get("image", "")
+                if isinstance(img, list):
+                    image_url = str(img[0].get("#text", "") if isinstance(img[0], dict) else img[0])
+                elif isinstance(img, dict):
+                    image_url = str(img.get("#text", "") or img.get("@src", ""))
+                else:
+                    image_url = str(img)
+        if not image_url:
+            image_url = str(item.get("image_url", "") or item.get("image", "") or item.get("imagen", ""))
+        if not image_url:
+            image_url = f"https://placehold.co/400x250/1a1a2e/ffffff?text={name[:20]}"
+
+        # Extra fields (from CSV conversion)
+        extra = item.get("extra", {})
+        if isinstance(extra, dict) and extra:
+            extra_parts = []
+            for k, v in extra.items():
+                if isinstance(v, str) and v and v.lower() not in ("", "nan", "none", "null"):
+                    extra_parts.append(f"{k}: {v}")
+                elif isinstance(v, dict) and v.get("#text"):
+                    extra_parts.append(f"{k}: {v['#text']}")
+            if extra_parts:
+                description = description + " | " + " | ".join(extra_parts) if description else " | ".join(extra_parts)
+
+        # Stock
+        stock_val = comercial.get("stock", "") or ""
+        if not stock_val:
+            stock_info = item.get("stock", {})
+            if isinstance(stock_info, dict):
+                stock_val = str(stock_info.get("status", "in_stock"))
+            else:
+                stock_val = str(stock_info) if stock_info else "in_stock"
+        else:
+            stock_val = str(stock_val)
+        in_stock = stock_val not in ("0", "out_of_stock", "false", "False", "")
+
+        # Para coches: intentar campos espec\u00edficos
+        brand = str(bodega or info.get("bodega", "") or item.get("brand", "") or item.get("marca", "") or item.get("make", "") or category)
+        model = str(item.get("model", "") or item.get("modelo", ""))
+        year = safe_int(cosecha or item.get("year", 0) or item.get("anyo", 0) or item.get("ano", 0))
+        km = safe_int(item.get("km", 0) or item.get("kilometers", 0))
+        fuel = str(item.get("fuel", "") or item.get("combustible", ""))
+        transmission = str(item.get("transmission", "") or item.get("cambio", ""))
+
+        # URL de detalle
+        if url:
+            detail_url = url
+        else:
+            detail_url = detail_pattern.format(
+                make=slugify(brand) if brand else slugify(name),
+                model=slugify(model) if model else "",
+                id=item_id,
+                slug=slugify(name),
+            )
+
+        return {
+            "id": item_id,
+            "brand": brand or category,
+            "model": model or name,
+            "title": name,
+            "year": year,
+            "km": km,
+            "fuel": fuel,
+            "transmission": transmission,
+            "body_type": category,
+            "color": str(item.get("color", "")),
+            "price": round(price) if price else 0,
+            "price_formatted": f"{price:,.2f} \u20ac".replace(",", ".") if price else "0 \u20ac",
+            "image_url": image_url,
+            "detail_url": detail_url,
+            "description": description[:2000],
+            "in_stock": in_stock,
+            "country": pais,
+            "equipment": {},
+        }
 
     def _parse_rest_vehicle(self, v: dict, detail_pattern: str) -> dict:
         """Convierte un vehículo de la API REST de Worldcars al formato estándar."""
@@ -386,14 +604,27 @@ class InventoryAdapter:
         km_max: Optional[int] = None,
         color: Optional[str] = None,
         seats_min: Optional[int] = None,
-    ) -> list[dict]:
+        country: Optional[str] = None,
+    ) -> list[dict] | dict:
         all_vehicles = await self._get_all_vehicles()
         results = all_vehicles[:]
 
         if brand:
-            results = [v for v in results if brand.lower() in v.get("brand", "").lower()]
+            b = brand.lower()
+            # First try title + brand + body_type + country (strong match)
+            strong = [v for v in results if b in (v.get("brand","") + " " + v.get("title","") + " " + v.get("body_type","") + " " + (v.get("country","") or "")).lower()]
+            if len(strong) >= 3:
+                results = strong
+            else:
+                # Include description matches but only for wine products (not aceite, agua, etc.)
+                desc_matches = [v for v in results if b in (v.get("description","")).lower()]
+                # Filter: keep only items that are wine (body_type starts with "Vino" or "Pack" or "Bodega" or is empty)
+                wine_cats = ("vino", "pack", "bodega", "champagne", "cava", "espumoso", "generoso", "dulce", "rosado")
+                desc_matches = [v for v in desc_matches if not v.get("body_type") or any(v.get("body_type","").lower().startswith(wc) for wc in wine_cats)]
+                results = strong + [v for v in desc_matches if v not in strong]
         if model:
-            results = [v for v in results if model.lower() in v.get("model", "").lower()]
+            m = model.lower()
+            results = [v for v in results if m in (v.get("model","") + " " + v.get("title","") + " " + v.get("brand","") + " " + v.get("description","")).lower()]
         if price_min is not None:
             results = [v for v in results if v.get("price", 0) >= price_min]
         if price_max is not None:
@@ -405,14 +636,18 @@ class InventoryAdapter:
             norm = normalize_trans(transmission)
             results = [v for v in results if v.get("transmission", "") == norm]
         if body_type:
+            bt = body_type.lower()
             norm = normalize_body(body_type)
-            filtered_strict = [v for v in results if v.get("body_type", "") == norm]
-            if filtered_strict:
-                results = filtered_strict
-            else:
-                # No hay coincidencias exactas — incluir vehículos sin body_type
-                # (pueden ser tipos no mapeados aún, ej: industriales)
-                results = [v for v in results if v.get("body_type", "") in (norm, "")]
+            # Primero intenta match exacto normalizado
+            filtered = [v for v in results if v.get("body_type", "") == norm]
+            if not filtered:
+                # Fallback: substring match (ej: "tinto" en "Vino Tinto")
+                filtered = [v for v in results if bt in v.get("body_type", "").lower()]
+            if not filtered:
+                # Último recurso: incluir sin body_type
+                filtered = [v for v in results if v.get("body_type", "") in (norm, "")]
+            if filtered:
+                results = filtered
         if year_min is not None:
             results = [v for v in results if v.get("year", 0) >= year_min]
         if km_max is not None:
@@ -421,8 +656,18 @@ class InventoryAdapter:
             results = [v for v in results if color.lower() in v.get("color", "").lower()]
         if seats_min is not None:
             results = [v for v in results if (v.get("seats") or 0) >= seats_min]
+        if country:
+            c = country.lower()
+            results = [v for v in results if c in (v.get("country", "") or "").lower()]
 
         logger.info(f"Busqueda ({self.mode}): {len(results)} resultados de {len(all_vehicles)} total")
+        if len(results) > 10:
+            return {
+                "total_encontrados": len(results),
+                "mostrando": 5,
+                "mensaje": f"Se encontraron {len(results)} productos que coinciden.",
+                "productos": results[:5],
+            }
         return results[:5]
 
     async def get_vehicle_details(self, vehicle_id: str) -> Optional[dict]:
