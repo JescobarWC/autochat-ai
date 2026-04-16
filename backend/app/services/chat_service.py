@@ -411,47 +411,47 @@ class ChatService:
             await self.db.commit()
             logger.info(f"Lead guardado: {lead.name} ({self.tenant_id})")
 
-            # Enviar al webhook si está configurado
+            # Construir lead_data (usado tanto por webhook como por email)
             cfg = self.tenant.get("config") or {}
+            lead_data: dict = {
+                "name": lead.name or "",
+                "phone": lead.phone or "",
+                "email": lead.email or "",
+                "postal_code": lead.postal_code or "",
+                "financing_needed": lead.financing_needed if lead.financing_needed is not None else False,
+                "vehicle_interest_id": lead.vehicle_interest_id or "",
+                "interest_type": lead.interest_type or "",
+                "notes": lead.notes or "",
+                "created_at": lead.created_at.isoformat() if lead.created_at else "",
+            }
+
+            # Enriquecer con datos del vehículo si hay vehicle_interest_id
+            if lead.vehicle_interest_id:
+                try:
+                    vehicle = await self.inventory.get_vehicle_details(lead.vehicle_interest_id)
+                    if vehicle:
+                        company_website = ((cfg.get("company_info") or {}).get("website") or "").rstrip("/")
+                        detail_url = vehicle.get("detail_url", "")
+                        vehicle_url = f"{company_website}{detail_url}" if company_website else detail_url
+                        lead_data.update({
+                            "vehicle_brand": vehicle.get("brand", ""),
+                            "vehicle_model": vehicle.get("model", ""),
+                            "vehicle_brand_model": f"{vehicle.get('brand', '')} {vehicle.get('model', '')}".strip(),
+                            "vehicle_title": vehicle.get("title", ""),
+                            "vehicle_year": vehicle.get("year", ""),
+                            "vehicle_price": vehicle.get("price", ""),
+                            "vehicle_price_str": str(vehicle.get("price", "")),
+                            "vehicle_plate": vehicle.get("plate", ""),
+                            "vehicle_url": vehicle_url,
+                            "vehicle_km": vehicle.get("km", ""),
+                            "vehicle_fuel": vehicle.get("fuel", ""),
+                        })
+                except Exception as ve:
+                    logger.warning(f"No se pudo enriquecer lead con vehículo: {ve}")
+
+            # Enviar al webhook si está configurado
             webhook_url = cfg.get("webhook_url", "").strip()
             if webhook_url:
-                # Datos base del lead
-                lead_data: dict = {
-                    "name": lead.name or "",
-                    "phone": lead.phone or "",
-                    "email": lead.email or "",
-                    "postal_code": lead.postal_code or "",
-                    "financing_needed": lead.financing_needed if lead.financing_needed is not None else False,
-                    "vehicle_interest_id": lead.vehicle_interest_id or "",
-                    "interest_type": lead.interest_type or "",
-                    "notes": lead.notes or "",
-                    "created_at": lead.created_at.isoformat() if lead.created_at else "",
-                }
-
-                # Enriquecer con datos del vehículo si hay vehicle_interest_id
-                if lead.vehicle_interest_id:
-                    try:
-                        vehicle = await self.inventory.get_vehicle_details(lead.vehicle_interest_id)
-                        if vehicle:
-                            company_website = ((cfg.get("company_info") or {}).get("website") or "").rstrip("/")
-                            detail_url = vehicle.get("detail_url", "")
-                            vehicle_url = f"{company_website}{detail_url}" if company_website else detail_url
-                            lead_data.update({
-                                "vehicle_brand": vehicle.get("brand", ""),
-                                "vehicle_model": vehicle.get("model", ""),
-                                "vehicle_brand_model": f"{vehicle.get('brand', '')} {vehicle.get('model', '')}".strip(),
-                                "vehicle_title": vehicle.get("title", ""),
-                                "vehicle_year": vehicle.get("year", ""),
-                                "vehicle_price": vehicle.get("price", ""),
-                                "vehicle_price_str": str(vehicle.get("price", "")),
-                                "vehicle_plate": vehicle.get("plate", ""),
-                                "vehicle_url": vehicle_url,
-                                "vehicle_km": vehicle.get("km", ""),
-                                "vehicle_fuel": vehicle.get("fuel", ""),
-                            })
-                    except Exception as ve:
-                        logger.warning(f"No se pudo enriquecer lead con vehículo: {ve}")
-
                 # Aplicar mapeo de campos si está configurado
                 field_mapping = cfg.get("webhook_field_mapping") or {}
                 if field_mapping and isinstance(field_mapping, dict):
@@ -490,6 +490,13 @@ class ChatService:
                     logger.info(f"Webhook enviado a {webhook_url}")
                 except Exception as wh_err:
                     logger.warning(f"Webhook falló ({webhook_url}): {wh_err}")
+
+            # Enviar notificación por email si está configurada
+            try:
+                from app.services.email_service import send_lead_notification
+                await send_lead_notification(lead_data, cfg, self.tenant.get("name", ""))
+            except Exception as em_err:
+                logger.warning(f"Error enviando email de lead: {em_err}")
 
             return {"success": True, "message": f"Datos de {lead.name} registrados correctamente."}
         except Exception as e:
